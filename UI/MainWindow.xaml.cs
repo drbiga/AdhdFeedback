@@ -22,13 +22,17 @@ namespace UI
         static double POSITION_TICK_TIME = 0.1; // timer ticks every 100 miliseconds
         static double POSITION_TOTAL_TIME = 1;
         static double LIGHT_TICK_TIME = 1;
-        
+        static double FEEDBACK_BEEP_PERIOD = 30;
+
+
         // Timer to track time once mouse enters the window
         private DispatcherTimer positionTimer;
         private double remainingTime;
 
         private DispatcherTimer lightTimer;
         private MediaPlayer beepPlayer;
+        private double timeSinceLastFeedbackBeep;
+
 
         public IWindowPositionState positionState;
         public Screen screen;
@@ -55,6 +59,7 @@ namespace UI
             lightTimer.Start();
             beepPlayer = new MediaPlayer();
             beepPlayer.Open(new Uri(@"Media\Beep.mp3", UriKind.Relative));
+            timeSinceLastFeedbackBeep = 0;
 
             // We need to do this so that the instance gets created and it tries
             // to connect to the local server.
@@ -161,7 +166,6 @@ namespace UI
         // Lighting management methods
         public void LightTimer_Tick(object sender, EventArgs e)
         {
-            beepPlayer.Play();
             // We will update the feedback every time here and control the frequency with the
             // tick interval variable defined at the start of the class
             Feedback feedback;
@@ -174,6 +178,7 @@ namespace UI
                 SetGray();
                 return;
             }
+            timeSinceLastFeedbackBeep += LIGHT_TICK_TIME;
             if (feedback == null)
             {
                 Debug.WriteLine("Feedback is currently null");
@@ -184,7 +189,12 @@ namespace UI
             {
                 case FeedbackType.DISTRACTED:
                     SetRed();
-                    beepPlayer.Play();
+                    if (timeSinceLastFeedbackBeep > FEEDBACK_BEEP_PERIOD)
+                    {
+                        timeSinceLastFeedbackBeep = 0;
+                        beepPlayer.Play();
+                        beepPlayer.Position = TimeSpan.Zero;
+                    }
                     break;
                 case FeedbackType.NORMAL:
                     SetYellow();
