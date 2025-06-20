@@ -7,6 +7,7 @@ using System.Windows.Threading;
 
 using UI.Util;
 using UI.Services;
+using Point = System.Windows.Point;
 
 namespace UI
 {
@@ -37,6 +38,9 @@ namespace UI
         public IWindowPositionState positionState;
         public Screen screen;
 
+        private Feedback? previousFeedback = null;
+        private Feedback? currentFeedback = null;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -66,7 +70,7 @@ namespace UI
             // It also needs to start checking for IAM sessions and feedback as
             // soon as the light timer ticks, so we need the service initialized
             // prior to that.
-            SessionExecutionService.GetOrCreate();
+            MockSessionExecutionService.GetOrCreate();
         }
 
         // -----------------------------------------------------------------
@@ -168,10 +172,10 @@ namespace UI
         {
             // We will update the feedback every time here and control the frequency with the
             // tick interval variable defined at the start of the class
-            Feedback feedback;
             try
             {
-                feedback = SessionExecutionService.GetOrCreate().GetCurrentFeedback();
+                previousFeedback = currentFeedback;
+                currentFeedback = MockSessionExecutionService.GetOrCreate().GetCurrentFeedback();
             }
             catch (StudentSessionNotStartedException)
             {
@@ -179,13 +183,28 @@ namespace UI
                 return;
             }
             timeSinceLastFeedbackBeep += LIGHT_TICK_TIME;
-            if (feedback == null)
+            if (currentFeedback == null)
             {
                 Debug.WriteLine("Feedback is currently null");
                 return;
             }
-            Debug.WriteLine(feedback.ToString());
-            switch (feedback.output)
+            Debug.WriteLine(currentFeedback.ToString());
+            bool gotWorse = false;
+            if (previousFeedback != null)
+            {
+                gotWorse = (
+                    (previousFeedback.output == FeedbackType.FOCUSED && currentFeedback.output == FeedbackType.NORMAL) ||
+                    (previousFeedback.output == FeedbackType.NORMAL && currentFeedback.output == FeedbackType.DISTRACTED) ||
+                    (previousFeedback.output == FeedbackType.FOCUSED && currentFeedback.output == FeedbackType.DISTRACTED)
+                );
+            }
+                
+            if (gotWorse)
+            {
+                PulseAnimation();
+            }
+            Debug.WriteLine(currentFeedback.ToString());
+            switch (currentFeedback.output)
             {
                 case FeedbackType.DISTRACTED:
                     SetRed();
@@ -250,6 +269,51 @@ namespace UI
             else
                 SetGreen();
         }
+
+        private void PulseAnimation()
+        {
+            var transform = this.RenderTransform as ScaleTransform;
+            if (transform == null)
+            {
+                transform = new ScaleTransform(1.0, 1.0);
+                this.RenderTransform = transform;
+                this.RenderTransformOrigin = new Point(0.5, 0.5);
+            }
+
+            var scaleUp = new DoubleAnimation
+            {
+                To = 1.1,
+                Duration = TimeSpan.FromMilliseconds(150),
+                AutoReverse = true,
+                EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut }
+            };
+
+            transform.BeginAnimation(ScaleTransform.ScaleXProperty, scaleUp);
+            transform.BeginAnimation(ScaleTransform.ScaleYProperty, scaleUp);
+        }
+        //private void PulseWindow()
+        //{
+        //    if (this.RenderTransform is not ScaleTransform scaleTransform)
+        //    {
+        //        scaleTransform = new ScaleTransform(1.0, 1.0);
+        //        this.RenderTransform = scaleTransform;
+        //        this.RenderTransformOrigin = new Point(0.5, 0.5);
+        //    }
+
+        //    var pulseAnim = new DoubleAnimation
+        //    {
+        //        From = 1.0,
+        //        To = 1.1,
+        //        Duration = TimeSpan.FromMilliseconds(150),
+        //        AutoReverse = true,
+        //        EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut }
+        //    };
+
+        //    scaleTransform.BeginAnimation(ScaleTransform.ScaleXProperty, pulseAnim);
+        //    scaleTransform.BeginAnimation(ScaleTransform.ScaleYProperty, pulseAnim);
+        //}
+
+
     }
 
     public enum TrafficLightColor

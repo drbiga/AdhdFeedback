@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UI"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="MainWindow"
         WindowStyle="None"
@@ -11,22 +12,25 @@
         AllowsTransparency="True"
         Background="Transparent"
         Topmost="True"
-        Width="120"
-        Height="40"
+        Width="160"
+        Height="60"
         >
+    <Window.Resources>
+        <sys:Double x:Key="LightSize">40</sys:Double>
+    </Window.Resources>
     <Grid>
         <StackPanel x:Name="EllipseStackPanel" Background="#111" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-            <Ellipse x:Name="RedLight" Width="32" Height="32" Margin="4"
+            <Ellipse x:Name="RedLight" Width="{StaticResource LightSize}" Height="{StaticResource LightSize}" Margin="4"
                  Fill="#f33"
                  HorizontalAlignment="Center"
                  VerticalAlignment="Center" />
 
-            <Ellipse x:Name="YellowLight" Width="32" Height="32" Margin="4"
+            <Ellipse x:Name="YellowLight" Width="{StaticResource LightSize}" Height="{StaticResource LightSize}" Margin="4"
                  Fill="#ee3"
                  HorizontalAlignment="Center"
                  VerticalAlignment="Center" />
 
-            <Ellipse x:Name="GreenLight" Width="32" Height="32" Margin="4"
+            <Ellipse x:Name="GreenLight" Width="{StaticResource LightSize}" Height="{StaticResource LightSize}" Margin="4"
                  Fill="#3c3"
                  HorizontalAlignment="Center"
                  VerticalAlignment="Center" />
