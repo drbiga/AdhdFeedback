@@ -192,8 +192,7 @@ namespace UI
                     if (timeSinceLastFeedbackBeep > FEEDBACK_BEEP_PERIOD)
                     {
                         timeSinceLastFeedbackBeep = 0;
-                        beepPlayer.Play();
-                        beepPlayer.Position = TimeSpan.Zero;
+                        PlayBeep();
                     }
                     break;
                 case FeedbackType.NORMAL:
@@ -206,6 +205,12 @@ namespace UI
                     Debug.WriteLine("Invalid Feedback");
                     throw new Exception("Invalid feedback type returned from backend");
             }
+        }
+
+        public void PlayBeep()
+        {
+            beepPlayer.Play();
+            beepPlayer.Position = TimeSpan.Zero;
         }
 
         public void SetRed()

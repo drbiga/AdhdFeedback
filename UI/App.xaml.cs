@@ -17,7 +17,9 @@ namespace UI
         {
             base.OnStartup(e);
 
-            // Iterate over all connected screens
+            // ------------------------------------------------------------------
+            // Main App
+            // Iterate over all connected 
             foreach (var screen in Screen.AllScreens)
             {
                 // Create a new window on this screen
@@ -34,6 +36,9 @@ namespace UI
                 window.Show();
                 activeWindows.Add(window); // Add the window to the active list
             }
+            // ------------------------------------------------------------------
+            // Http Server
+            HttpServer.Start();
         }
     }
 
