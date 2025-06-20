@@ -12,11 +12,11 @@
         AllowsTransparency="True"
         Background="Transparent"
         Topmost="True"
-        Width="160"
-        Height="60"
+        Width="200"
+        Height="80"
         >
     <Window.Resources>
-        <sys:Double x:Key="LightSize">40</sys:Double>
+        <sys:Double x:Key="LightSize">50</sys:Double>
     </Window.Resources>
     <Grid>
         <StackPanel x:Name="EllipseStackPanel" Background="#111" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
