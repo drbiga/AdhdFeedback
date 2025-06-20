@@ -70,7 +70,7 @@ namespace UI
             // It also needs to start checking for IAM sessions and feedback as
             // soon as the light timer ticks, so we need the service initialized
             // prior to that.
-            MockSessionExecutionService.GetOrCreate();
+            SessionExecutionService.GetOrCreate();
         }
 
         // -----------------------------------------------------------------
@@ -175,7 +175,7 @@ namespace UI
             try
             {
                 previousFeedback = currentFeedback;
-                currentFeedback = MockSessionExecutionService.GetOrCreate().GetCurrentFeedback();
+                currentFeedback = SessionExecutionService.GetOrCreate().GetCurrentFeedback();
             }
             catch (StudentSessionNotStartedException)
             {
