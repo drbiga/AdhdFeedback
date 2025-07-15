@@ -1,7 +1,10 @@
 ﻿using System.Configuration;
 using System.Data;
+using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Interop;
 using Application = System.Windows.Application;
+using Point = System.Windows.Point;
 
 namespace UI
 {
@@ -10,11 +13,16 @@ namespace UI
     /// </summary>
     public partial class App : Application
     {
+        [DllImport("user32.dll")]
+        private static extern bool SetProcessDpiAwarenessContext(IntPtr dpiContext);
+        private static readonly IntPtr DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 = new IntPtr(-4);
+
         // List to track active windows
         private static List<MainWindow> activeWindows = new List<MainWindow>();
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
             base.OnStartup(e);
 
             // ------------------------------------------------------------------

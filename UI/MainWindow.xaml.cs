@@ -8,6 +8,7 @@ using System.Windows.Threading;
 using UI.Util;
 using UI.Services;
 using Point = System.Windows.Point;
+using System.Windows.Forms;
 
 namespace UI
 {
@@ -342,8 +343,11 @@ namespace UI
 
         public void Move()
         {
-            this.window.Left = PixelUnitConverter.PixelsToDipsX(this.window.screen.Bounds.Width / 2, this.window) - this.window.Width;
-            this.window.Top = 0;
+            double screenLeftDips = PixelUnitConverter.PixelsToDipsX(this.window.screen.Bounds.Left, this.window);
+            double screenWidthDips = PixelUnitConverter.PixelsToDipsX(this.window.screen.Bounds.Width, window);
+            this.window.Left = screenLeftDips + (screenWidthDips - this.window.Width) / 2;
+            double screenTopDips = PixelUnitConverter.PixelsToDipsY(this.window.screen.Bounds.Top, window);
+            this.window.Top = screenTopDips;
         }
 
         public void Next()
@@ -369,10 +373,18 @@ namespace UI
 
         public void Move()
         {
-            // If on left-center, then move to top center
-            // and make it horizontal
-            this.window.Left = 0;
-            this.window.Top = PixelUnitConverter.PixelsToDipsY(this.window.screen.Bounds.Height / 2, this.window) - this.window.Height;
+            var screen = this.window.screen;
+
+            // Convert screen Y position and height to DIPs
+            double screenTopDips = PixelUnitConverter.PixelsToDipsY(screen.Bounds.Top, window);
+            double screenHeightDips = PixelUnitConverter.PixelsToDipsY(screen.Bounds.Height, window);
+
+            // Align to left of screen
+            double screenLeftDips = PixelUnitConverter.PixelsToDipsX(screen.Bounds.Left, window);
+            this.window.Left = screenLeftDips;
+
+            // Center vertically
+            this.window.Top = screenTopDips + (screenHeightDips - this.window.Height) / 2;
         }
 
         public void Next()
