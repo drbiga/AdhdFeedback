@@ -21,6 +21,10 @@ namespace UI
                 {
                     await context.Response.WriteAsync("Beep");
                 });
+                app.MapGet("/health-check", async context =>
+                {
+                    await context.Response.WriteAsync("Check OK");
+                });
                 // Define endpoints here
                 app.MapGet("/play-beep", async context =>
                 {
