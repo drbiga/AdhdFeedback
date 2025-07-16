@@ -1,6 +1,7 @@
 ﻿// HttpServer.cs
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Application = System.Windows.Application;
 
 namespace UI
@@ -16,7 +17,18 @@ namespace UI
             _apiThread = new Thread(() =>
             {
                 var builder = WebApplication.CreateBuilder();
+                builder.Services.AddCors(options =>
+                {
+                    options.AddPolicy("AllowAll", policy =>
+                    {
+                        policy
+                            .AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader();
+                    });
+                });
                 var app = builder.Build();
+                app.UseCors("AllowAll");
                 app.MapGet("/", async context =>
                 {
                     await context.Response.WriteAsync("Beep");
