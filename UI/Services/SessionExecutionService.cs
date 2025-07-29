@@ -103,12 +103,12 @@ namespace UI.Services
         {
             this.iamSession = null;
             this.currentFeedback = null;
-            //this.backendProtocol = "https";
-            //this.backendHost = "lsuadhd.centralus.cloudapp.azure.com";
-            //this.backendPort = 443;
-            this.backendProtocol = "http";
-            this.backendHost = "localhost";
-            this.backendPort = 8000;
+            this.backendProtocol = "https";
+            this.backendHost = "lsuadhd.centralus.cloudapp.azure.com";
+            this.backendPort = 443;
+            //this.backendProtocol = "http";
+            //this.backendHost = "localhost";
+            //this.backendPort = 8000;
 
             Task.Run(async () => await InitializeIamSession());
         }
@@ -167,7 +167,7 @@ namespace UI.Services
 
                         string jsonResponse = await client.GetStringAsync(
                             String.Format(
-                                "{0}://{1}:{2}/session_execution/student/{3}/session/feedback",
+                                "{0}://{1}:{2}/api/session_execution/student/{3}/session/feedback",
                                 this.backendProtocol,
                                 this.backendHost,
                                 this.backendPort,
