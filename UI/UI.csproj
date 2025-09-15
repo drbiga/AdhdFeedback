@@ -9,6 +9,10 @@
 	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
 
+	<PropertyGroup>
+		<SelfContained>true</SelfContained>
+	</PropertyGroup>
+
   <ItemGroup>
     <None Remove="Media\Beep.mp3" />
   </ItemGroup>
