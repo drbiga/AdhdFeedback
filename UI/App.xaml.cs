@@ -27,7 +27,8 @@ namespace UI
 
             // ------------------------------------------------------------------
             // Main App
-            // Iterate over all connected 
+            // Iterate over all connected
+            int wid = 0;
             foreach (var screen in Screen.AllScreens)
             {
                 // Create a new window on this screen
@@ -36,7 +37,8 @@ namespace UI
                     WindowStartupLocation = WindowStartupLocation.Manual,
                     screen = screen
                 };
-
+                window.setWindowId(wid);
+                wid += 1;
                 window.Move();
                 window.SetGreen();
 
