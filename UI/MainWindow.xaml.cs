@@ -26,6 +26,9 @@ namespace UI
         static double LIGHT_TICK_TIME = 1;
         static double FEEDBACK_BEEP_PERIOD = 30;
 
+        // Window ID, used to identify which screen this window belongs to.
+        // This is used only when using multiple monitors.
+        private int wid;
 
         // Timer to track time once mouse enters the window
         private DispatcherTimer positionTimer;
@@ -72,6 +75,11 @@ namespace UI
             // soon as the light timer ticks, so we need the service initialized
             // prior to that.
             SessionExecutionService.GetOrCreate();
+        }
+
+        public void setWindowId(int wid)
+        {
+            this.wid = wid;
         }
 
         // -----------------------------------------------------------------
@@ -180,7 +188,8 @@ namespace UI
             }
             catch (StudentSessionNotStartedException)
             {
-                SetGray();
+                //SetGray();
+                SetGreen();
                 return;
             }
             timeSinceLastFeedbackBeep += LIGHT_TICK_TIME;
@@ -229,6 +238,8 @@ namespace UI
 
         public void PlayBeep()
         {
+            if (this.wid != 0)
+                return; // Only play beep on main window
             beepPlayer.Play();
             beepPlayer.Position = TimeSpan.Zero;
         }
