@@ -87,13 +87,21 @@ namespace UI.Services
         private string backendProtocol;
         private string backendHost;
         private int backendPort;
+        private string backendPrefix;
+        private string localServerHost;
+        private int localServerPort;
         private IamSession iamSession;
         private Feedback currentFeedback;
 
+        private DateTime datetimeLastUpdate;
+
+        // Singleton class
+        // Enforcing one single instance
         public static SessionExecutionService GetOrCreate()
         {
             if (instance == null)
             {
+                Debug.WriteLine("[ SessionExecutionService.GetOrCreate ] Creating new instance of the session execution service");
                 instance = new SessionExecutionService();
             }
             return instance;
@@ -106,9 +114,15 @@ namespace UI.Services
             this.backendProtocol = "https";
             this.backendHost = "lsuadhd.centralus.cloudapp.azure.com";
             this.backendPort = 443;
+            this.backendPrefix = "/api";
             //this.backendProtocol = "http";
-            //this.backendHost = "localhost";
+            //this.backendHost = "127.0.0.1";
             //this.backendPort = 8000;
+            //this.backendPrefix = "";
+            localServerHost = "localhost";
+            localServerPort = 8001;
+
+            datetimeLastUpdate = DateTime.Now;
 
             Task.Run(async () => await InitializeIamSession());
         }
@@ -135,6 +149,7 @@ namespace UI.Services
                 }
                 catch (Exception e)
                 {
+                    Debug.WriteLine(String.Format("[ SessionExecutionService.InitializeIamSession ] Exception when getting the IAM session: {0}", e.ToString()));
                     continue;
                 }
             }
@@ -143,7 +158,9 @@ namespace UI.Services
         async Task<IamSession> GetCurrentIamSession()
         {
             HttpClient client = new HttpClient();
-            string jsonResponse = await client.GetStringAsync("http://localhost:8001/session");
+            string jsonResponse = await client.GetStringAsync(
+                String.Format("http://{0}:{1}/session", localServerHost, localServerPort)
+            );
             Debug.WriteLine(jsonResponse);
             return JsonConvert.DeserializeObject<IamSession>(jsonResponse);
         }
@@ -154,6 +171,12 @@ namespace UI.Services
             {
                 throw new StudentSessionNotStartedException();
             }
+
+            if (DateTime.Now - this.datetimeLastUpdate < TimeSpan.FromSeconds(0.5))
+            {
+                return this.currentFeedback;
+            }
+            this.datetimeLastUpdate = DateTime.Now;
             // Running in another thread in order not to block unity and make the game appear laggy.
             Task.Run(() =>
             {
@@ -167,13 +190,15 @@ namespace UI.Services
 
                         string jsonResponse = await client.GetStringAsync(
                             String.Format(
-                                "{0}://{1}:{2}/api/session_execution/student/{3}/session/feedback",
+                                "{0}://{1}:{2}{3}/session_execution/student/{4}/session/feedback",
                                 this.backendProtocol,
                                 this.backendHost,
                                 this.backendPort,
+                                backendPrefix,
                                 iamSession.user.username
                             )
                         );
+                        Debug.WriteLine(jsonResponse);
                         feedback = JsonConvert.DeserializeObject<Feedback?>(jsonResponse);
                     }
                     catch (HttpRequestException error)
@@ -220,10 +245,11 @@ namespace UI.Services
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", iamSession.token);
             string jsonResponse = await client.GetStringAsync(
                 String.Format(
-                    "{0}://{1}:{2}/session_execution/student/{3}/remaining_sessions",
+                    "{0}://{1}:{2}{3}/session_execution/student/{4}/remaining_sessions",
                     this.backendProtocol,
                     this.backendHost,
                     this.backendPort,
+                    backendPrefix,
                     iamSession.user.username
                 )
             );
@@ -244,10 +270,11 @@ namespace UI.Services
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", iamSession.token);
             string jsonResponse = await client.GetStringAsync(
                 String.Format(
-                    "{0}://{1}:{2}/session_execution/student?student_name={3}",
+                    "{0}://{1}:{2}{3}/session_execution/student?student_name={4}",
                     this.backendProtocol,
                     this.backendHost,
                     this.backendPort,
+                    backendPrefix,
                     iamSession.user.username
                 )
             );
