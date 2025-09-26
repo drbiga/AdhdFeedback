@@ -93,6 +93,8 @@ namespace UI.Services
         private IamSession iamSession;
         private Feedback currentFeedback;
 
+        private bool sessionHasFeedback;
+
         private DateTime datetimeLastUpdate;
 
         // Singleton class
@@ -111,18 +113,28 @@ namespace UI.Services
         {
             this.iamSession = null;
             this.currentFeedback = null;
+
+            // ------------------------------------------------------------------------
+            // Production backend config
             this.backendProtocol = "https";
             this.backendHost = "lsuadhd.centralus.cloudapp.azure.com";
             this.backendPort = 443;
             this.backendPrefix = "/api";
+
+            // ------------------------------------------------------------------------
+            // Test backend config
             //this.backendProtocol = "http";
             //this.backendHost = "127.0.0.1";
             //this.backendPort = 8000;
             //this.backendPrefix = "";
+
+            // ------------------------------------------------------------------------
             localServerHost = "localhost";
             localServerPort = 8001;
 
             datetimeLastUpdate = DateTime.Now;
+
+            this.sessionHasFeedback = true;
 
             Task.Run(async () => await InitializeIamSession());
         }
@@ -200,12 +212,19 @@ namespace UI.Services
                         );
                         Debug.WriteLine(jsonResponse);
                         feedback = JsonConvert.DeserializeObject<Feedback?>(jsonResponse);
+                        sessionHasFeedback = true;
                     }
                     catch (HttpRequestException error)
                     {
                         if (error.StatusCode == HttpStatusCode.BadRequest)
                         {
                             Debug.WriteLine("Feedback still not available. User possibly did not start session yet.");
+                        }
+                        if (error.StatusCode == HttpStatusCode.MethodNotAllowed)
+                        {
+                            this.sessionHasFeedback = false;
+                            Debug.WriteLine("Feedback not available. User possibly has no feedback for this session.\n" + error.Data);
+                            Trace.WriteLine("Feedback not available. User possibly has no feedback for this session.\n" + error.Data);
                         }
                     }
                     return feedback;
@@ -285,6 +304,11 @@ namespace UI.Services
             };
             SessionExecutionStudent student = JsonConvert.DeserializeObject<SessionExecutionStudent>(jsonResponse, settings);
             return student.active_session;
+        }
+
+        public bool SessionHasFeedback()
+        {
+            return this.sessionHasFeedback;
         }
     }
 }

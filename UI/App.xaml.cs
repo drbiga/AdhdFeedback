@@ -1,5 +1,7 @@
 ﻿using System.Configuration;
 using System.Data;
+using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
@@ -22,6 +24,19 @@ namespace UI
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            string logDir = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "ADHD Feedback", "Logs");
+
+            Directory.CreateDirectory(logDir);
+
+            string logPath = Path.Combine(logDir, "app.log");
+
+            Trace.Listeners.Add(new TextWriterTraceListener(logPath));
+            Trace.AutoFlush = true;
+
+            Trace.WriteLine("Application started at " + DateTime.Now);
+
             SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
             base.OnStartup(e);
 

@@ -30,15 +30,23 @@ namespace UI
         // This is used only when using multiple monitors.
         private int wid;
 
-        // Timer to track time once mouse enters the window
+        // -------------------------------------------------
+        // Timer to control position using mouse hover
         private DispatcherTimer positionTimer;
         private double remainingTime;
 
+        // -------------------------------------------------
+        // Timer to control light color based on feedback
         private DispatcherTimer lightTimer;
         private MediaPlayer beepPlayer;
         private double timeSinceLastFeedbackBeep;
 
+        // -------------------------------------------------
+        // Timer to control window visibility based on feedback availability
+        private DispatcherTimer visibilityTimer;
 
+
+        // -------------------------------------------------
         public IWindowPositionState positionState;
         public Screen screen;
 
@@ -69,6 +77,16 @@ namespace UI
             beepPlayer.Open(new Uri(@"Media\Beep.mp3", UriKind.Relative));
             timeSinceLastFeedbackBeep = 0;
 
+            // -----------------------------------------------------------------
+            // Timer to close the screen based on the server's feedback response.
+            // If the server tells us that feedback is not available, we close the window
+            // to avoid any confusion.
+            visibilityTimer = new DispatcherTimer();
+            visibilityTimer.Interval = TimeSpan.FromSeconds(1);
+            visibilityTimer.Tick += TickVisibility;
+            visibilityTimer.Start();
+
+            // -----------------------------------------------------------------
             // We need to do this so that the instance gets created and it tries
             // to connect to the local server.
             // It also needs to start checking for IAM sessions and feedback as
@@ -80,6 +98,17 @@ namespace UI
         public void setWindowId(int wid)
         {
             this.wid = wid;
+        }
+
+        // -----------------------------------------------------------------
+        // Visibility control
+        private void TickVisibility(object sender, EventArgs e)
+        {
+            Debug.WriteLine("Evaluating window visibility");
+            if (SessionExecutionService.GetOrCreate().SessionHasFeedback())
+                this.Show();
+            else
+                this.Hide();
         }
 
         // -----------------------------------------------------------------
