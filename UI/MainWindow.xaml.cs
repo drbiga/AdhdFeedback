@@ -241,6 +241,7 @@ namespace UI
             if (gotWorse)
             {
                 PulseAnimation();
+                PlayBeep();
             }
             Debug.WriteLine(currentFeedback.ToString());
             switch (currentFeedback.output)
@@ -250,7 +251,13 @@ namespace UI
                     if (timeSinceLastFeedbackBeep > FEEDBACK_BEEP_PERIOD)
                     {
                         timeSinceLastFeedbackBeep = 0;
-                        PlayBeep();
+                        // Avoid beeping twice if we already beeped because the feedback got worse
+                        // So, we only play the beep if the feedback did not get worse on this iteration.
+                        if (!gotWorse)
+                        {
+                            PlayBeep();
+                            PulseAnimation();
+                        }
                     }
                     break;
                 case FeedbackType.NORMAL:
@@ -323,7 +330,7 @@ namespace UI
 
             var scaleUp = new DoubleAnimation
             {
-                To = 1.1,
+                To = 1.5,
                 Duration = TimeSpan.FromMilliseconds(150),
                 AutoReverse = true,
                 EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut }
