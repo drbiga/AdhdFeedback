@@ -32,7 +32,7 @@ namespace UI
                 app.MapGet("/", async context =>
                 {
                     await context.Response.WriteAsync("Beep");
-                });
+                }); 
                 app.MapGet("/health-check", async context =>
                 {
                     await context.Response.WriteAsync("Check OK");
@@ -42,7 +42,7 @@ namespace UI
                 {
                     Application.Current.Dispatcher.Invoke(() =>
                     {
-                        if (Application.Current.MainWindow is MainWindow mainWindow)
+                        if (Application.Current.MainWindow is TrafficLightWindow mainWindow)
                         {
                             mainWindow.PlayBeep();
                         }

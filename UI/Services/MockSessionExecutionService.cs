@@ -4,6 +4,8 @@ using System.Net.Http.Headers;
 using System.Net.Http;
 using System.Diagnostics;
 
+using UI.Models;
+
 namespace UI.Services
 {
     class MockSessionExecutionService
@@ -27,54 +29,54 @@ namespace UI.Services
         {
             Feedback focusedFeedback = new Feedback
             {
-                personal_analytics_data = new PersonalAnalyticsData
+                personal_analytics_data = new Feedback.PersonalAnalyticsData
                 {
                     num_mouse_clicks = 10,
                     mouse_move_distance = 5.0f,
                     mouse_scroll_distance = 2.0f,
                     num_keyboard_strokes = 20,
-                    attention_feedback = FeedbackType.FOCUSED
+                    attention_feedback = Feedback.FeedbackType.FOCUSED
                 },
-                classifier_data = new ClassifierData
+                classifier_data = new Feedback.ClassifierData
                 {
                     screenshot = "screenshot_url",
                     prediction = "focused"
                 },
-                output = FeedbackType.FOCUSED
+                output = Feedback.FeedbackType.FOCUSED
             };
             Feedback normalFeedback = new Feedback
             {
-                personal_analytics_data = new PersonalAnalyticsData
+                personal_analytics_data = new Feedback.PersonalAnalyticsData
                 {
                     num_mouse_clicks = 10,
                     mouse_move_distance = 5.0f,
                     mouse_scroll_distance = 2.0f,
                     num_keyboard_strokes = 20,
-                    attention_feedback = FeedbackType.NORMAL
+                    attention_feedback = Feedback.FeedbackType.NORMAL
                 },
-                classifier_data = new ClassifierData
+                classifier_data = new Feedback.ClassifierData
                 {
                     screenshot = "screenshot_url",
                     prediction = "focused"
                 },
-                output = FeedbackType.NORMAL
+                output = Feedback.FeedbackType.NORMAL
             };
             Feedback distractedFeedback = new Feedback
             {
-                personal_analytics_data = new PersonalAnalyticsData
+                personal_analytics_data = new Feedback.PersonalAnalyticsData
                 {
                     num_mouse_clicks = 10,
                     mouse_move_distance = 5.0f,
                     mouse_scroll_distance = 2.0f,
                     num_keyboard_strokes = 20,
-                    attention_feedback = FeedbackType.NORMAL
+                    attention_feedback = Feedback.FeedbackType.NORMAL
                 },
-                classifier_data = new ClassifierData
+                classifier_data = new Feedback.ClassifierData
                 {
                     screenshot = "screenshot_url",
                     prediction = "focused"
                 },
-                output = FeedbackType.DISTRACTED
+                output = Feedback.FeedbackType.DISTRACTED
             };
             feedbackOptions = new List<Feedback> { focusedFeedback, normalFeedback, distractedFeedback };
             rand = new Random();
@@ -86,11 +88,11 @@ namespace UI.Services
         {
             if (isGoingUp)
             {
-                if (currentFeedback.output == FeedbackType.FOCUSED)
+                if (currentFeedback.output == Feedback.FeedbackType.FOCUSED)
                     currentFeedback = feedbackOptions[1];
-                else if (currentFeedback.output == FeedbackType.NORMAL)
+                else if (currentFeedback.output == Feedback.FeedbackType.NORMAL)
                     currentFeedback = feedbackOptions[2];
-                else if (currentFeedback.output == FeedbackType.DISTRACTED)
+                else if (currentFeedback.output == Feedback.FeedbackType.DISTRACTED)
                 {
                     isGoingUp = false;
                     currentFeedback = feedbackOptions[2];
@@ -98,14 +100,14 @@ namespace UI.Services
             }
             else
             {
-                if (currentFeedback.output == FeedbackType.FOCUSED)
+                if (currentFeedback.output == Feedback.FeedbackType.FOCUSED)
                 {
                     isGoingUp = true;
                     currentFeedback = feedbackOptions[0];
                 }
-                else if (currentFeedback.output == FeedbackType.NORMAL)
+                else if (currentFeedback.output == Feedback.FeedbackType.NORMAL)
                     currentFeedback = feedbackOptions[0];
-                else if (currentFeedback.output == FeedbackType.DISTRACTED)
+                else if (currentFeedback.output == Feedback.FeedbackType.DISTRACTED)
                     currentFeedback = feedbackOptions[1];
             }
                 return currentFeedback;

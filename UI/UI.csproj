@@ -7,13 +7,16 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
+	<Configurations>Debug;Release;Staging</Configurations>
   </PropertyGroup>
 
 	<PropertyGroup>
 		<SelfContained>true</SelfContained>
+		<PackageIcon>favicon.png</PackageIcon>
 	</PropertyGroup>
 
   <ItemGroup>
+    <None Remove="favicon.png" />
     <None Remove="Media\Beep.mp3" />
   </ItemGroup>
 
@@ -23,12 +26,20 @@
     </Content>
   </ItemGroup>
 
-  <ItemGroup>
+
+	<ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
     <ItemGroup>
 	    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Resource Include="favicon.png">
+        <Pack>True</Pack>
+        <PackagePath>\</PackagePath>
+      </Resource>
     </ItemGroup>
 
 

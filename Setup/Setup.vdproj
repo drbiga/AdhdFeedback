@@ -21,7 +21,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_CAF405C5496C4267A4ACE6608A848A75"
+        "MsmKey" = "8:_B2FF6571B1AC430DAFA469656CF7600A"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -92,6 +92,30 @@
                 }
             }
         }
+        "Staging"
+        {
+        "DisplayName" = "8:Staging"
+        "IsDebugOnly" = "11:FALSE"
+        "IsReleaseOnly" = "11:FALSE"
+        "OutputFilename" = "8:Staging\\Setup.msi"
+        "PackageFilesAs" = "3:2"
+        "PackageFileSize" = "3:-2147483648"
+        "CabType" = "3:1"
+        "Compression" = "3:2"
+        "SignOutput" = "11:FALSE"
+        "CertificateFile" = "8:"
+        "PrivateKeyFile" = "8:"
+        "TimeStampServer" = "8:"
+        "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
+        }
     }
     "Deployable"
     {
@@ -122,10 +146,10 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_CAF405C5496C4267A4ACE6608A848A75"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B2FF6571B1AC430DAFA469656CF7600A"
             {
-            "SourcePath" = "8:..\\..\\..\\..\\lsuadhd-frontend\\public\\favicon.ico"
-            "TargetName" = "8:favicon.ico"
+            "SourcePath" = "8:..\\UI\\favicon.png"
+            "TargetName" = "8:favicon.png"
             "Tag" = "8:"
             "Folder" = "8:_8C1DBC8BAD364489B6DE103F4AEAB1FB"
             "Condition" = "8:"
@@ -198,15 +222,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Adhd Feedback"
-        "ProductCode" = "8:{02464977-96E8-47CF-8CF7-12153E0CB32E}"
-        "PackageCode" = "8:{4EA937F2-3C91-4968-AD33-3F1C45BBDF7B}"
+        "ProductCode" = "8:{15357B64-4CC6-4182-A445-433E29A70A6A}"
+        "PackageCode" = "8:{69265247-C27C-4926-9431-E6F2A60D8985}"
         "UpgradeCode" = "8:{E30FD7B5-B9CC-429E-9FA0-2E0C7FE1A647}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.6"
+        "ProductVersion" = "8:1.0.7"
         "Manufacturer" = "8:LSU"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -330,7 +354,7 @@
             "Target" = "8:_8CBB8CF3422D4C9E882AD88D30308CDC"
             "Folder" = "8:_DC9D3F2C2A414E43B884C1C74BC7BFF3"
             "WorkingFolder" = "8:_8C1DBC8BAD364489B6DE103F4AEAB1FB"
-            "Icon" = "8:_CAF405C5496C4267A4ACE6608A848A75"
+            "Icon" = "8:"
             "Feature" = "8:"
             }
         }
