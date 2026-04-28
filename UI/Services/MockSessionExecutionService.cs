@@ -110,71 +110,23 @@ namespace UI.Services
                 else if (currentFeedback.output == Feedback.FeedbackType.DISTRACTED)
                     currentFeedback = feedbackOptions[1];
             }
-                return currentFeedback;
+            if (currentFeedback == null)
+            {
+                string message = "[ MockSessionExecutionService.GetCurrentFeedback ] The current feedback is null";
+                Debug.WriteLine(message);
+                Trace.WriteLine(message);
+                throw new Exception(message);
+            }
+            return currentFeedback;
         }
 
-        //public bool SessionIsSet()
-        //{
-        //    return this.iamSession != null;
-        //}
-
-        //public IamSession GetIamSession()
-        //{
-        //    return this.iamSession;
-        //}
-
-
-        ///// <summary>
-        ///// Gets the next session for the currently active student.
-        ///// Assumes that the current IAM session is already set.
-        ///// </summary>
-        ///// <returns>The next session the student is supposed to do.</returns>
-        //async public Task<Session> GetNextSession()
-        //{
-        //    if (iamSession == null)
-        //        throw new Exception("Student does not have an active session");
-        //    HttpClient client = new HttpClient();
-        //    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", iamSession.token);
-        //    string jsonResponse = await client.GetStringAsync(
-        //        String.Format(
-        //            "{0}://{1}:{2}/session_execution/student/{3}/remaining_sessions",
-        //            this.backendProtocol,
-        //            this.backendHost,
-        //            this.backendPort,
-        //            iamSession.user.username
-        //        )
-        //    );
-        //    var settings = new JsonSerializerSettings
-        //    {
-        //        NullValueHandling = NullValueHandling.Ignore,
-        //        MissingMemberHandling = MissingMemberHandling.Ignore
-        //    };
-        //    Session[] sessions = JsonConvert.DeserializeObject<Session[]>(jsonResponse, settings);
-        //    return sessions[0];
-        //}
-
-        //async public Task<Session> GetStudentActiveSession()
-        //{
-        //    if (iamSession == null)
-        //        throw new Exception("Student does not have an active session");
-        //    HttpClient client = new HttpClient();
-        //    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", iamSession.token);
-        //    string jsonResponse = await client.GetStringAsync(
-        //        String.Format(
-        //            "{0}://{1}:{2}/session_execution/student?student_name={3}",
-        //            this.backendProtocol,
-        //            this.backendHost,
-        //            this.backendPort,
-        //            iamSession.user.username
-        //        )
-        //    );
-        //    var settings = new JsonSerializerSettings
-        //    {
-        //        NullValueHandling = NullValueHandling.Ignore,
-        //        MissingMemberHandling = MissingMemberHandling.Ignore
-        //    };
-        //    SessionExecutionStudent student = JsonConvert.DeserializeObject<SessionExecutionStudent>(jsonResponse, settings);
-        //    return student.active_session;
-        //}
+        public bool SessionHasFeedback()
+        {
+            bool result = false;
+            string message = String.Format("[ MockSessionExecutionService ] SessionHasFeedback called. Returning {0}", result);
+            Debug.WriteLine(message);
+            Trace.WriteLine(message);
+            return result;
+        }
     }
 }
