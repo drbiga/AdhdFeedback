@@ -113,13 +113,13 @@ namespace UI
                 // Start beeping
                 timeSinceLastFeedbackBeep = BEEP_PERIOD; // So that it beeps immediately
                 StartBeeping();
-                Debug.WriteLine("Started beeping");
+                Debug.WriteLine("[ TrafficLightWindow.LightPropertyChanged ] Started beeping");
             }
             else
             {
                 // Stop beeping
                 StopBeeping();
-                Debug.WriteLine("Stopped beeping");
+                Debug.WriteLine("[ TrafficLightWindow.LightPropertyChanged ] Stopped beeping");
             }
 
             previousColor = currentColor;
@@ -144,11 +144,17 @@ namespace UI
         {
             if (vm.Enabled)
             {
+                string message = "[ TrafficLightWindow.EnabledPropertyChanged ] Traffic light enabled, showing window";
+                Debug.WriteLine(message);
+                Trace.WriteLine(message);
                 this.beepingEnabled = true;
                 this.Show();
             }
             else
             {
+                string message = "[ TrafficLightWindow.EnabledPropertyChanged ] Traffic light disabled, hiding window";
+                Debug.WriteLine(message);
+                Trace.WriteLine(message);
                 this.beepingEnabled = false;
                 this.Hide();
             }
