@@ -45,8 +45,15 @@ namespace UI.Services
 
     public class SessionExecutionService
     {
+        private enum BackendChoice
+        {
+            DEV,
+            STAGING,
+            PRODUCTION
+        }
+
         private static SessionExecutionService instance;
-        private bool isUsingStagingBackend;
+        private BackendChoice backendChoice;
         private string backendProtocol;
         private string backendHost;
         private int backendPort;
@@ -66,7 +73,9 @@ namespace UI.Services
         {
             if (instance == null)
             {
-                Debug.WriteLine("[ SessionExecutionService.GetOrCreate ] Creating new instance of the session execution service");
+                string message = "[ SessionExecutionService.GetOrCreate ] Creating new instance of the session execution service";
+                Debug.WriteLine(message);
+                Trace.WriteLine(message);
                 instance = new SessionExecutionService();
             }
             return instance;
@@ -80,14 +89,7 @@ namespace UI.Services
             // ------------------------------------------------------------------------
             // Local backend config for dev purposes
 #if DEBUG
-            //this.backendProtocol = "http";
-            //this.backendHost = "127.0.0.1";
-            //this.backendPort = 8000;
-            //this.backendPrefix = "";
-            this.backendProtocol = "https";
-            this.backendHost = "lsuadhd.centralus.cloudapp.azure.com";
-            this.backendPort = 443;
-            this.backendPrefix = "/api";
+            UseDevBackend();
 #endif
             // ------------------------------------------------------------------------
             // Staging backend config
@@ -144,12 +146,16 @@ namespace UI.Services
             }
         }
 
+        public void UseDevBackend()
+        {
+            this.backendProtocol = "http";
+            this.backendHost = "localhost";
+            this.backendPort = 8000;
+            this.backendPrefix = "/";
+        }
+
         public void UseStagingBackend()
         {
-            if (this.isUsingStagingBackend)
-            {
-                return;
-            }
             this.backendProtocol = "https";
             this.backendHost = "testlsuadhd.centralus.cloudapp.azure.com";
             this.backendPort = 443;
@@ -159,10 +165,6 @@ namespace UI.Services
 
         public void UseProductionBackend()
         {
-            if (!this.isUsingStagingBackend)
-            {
-                return;
-            }
             this.backendProtocol = "https";
             this.backendHost = "lsuadhd.centralus.cloudapp.azure.com";
             this.backendPort = 443;
@@ -278,37 +280,6 @@ namespace UI.Services
         {
             return this.iamSession;
         }
-
-
-        /// <summary>
-        /// Gets the next session for the currently active student.
-        /// Assumes that the current IAM session is already set.
-        /// </summary>
-        /// <returns>The next session the student is supposed to do.</returns>
-        //async public Task<Session> GetNextSession()
-        //{
-        //    if (iamSession == null)
-        //        throw new Exception("Student does not have an active session");
-        //    HttpClient client = new HttpClient();
-        //    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", iamSession.token);
-        //    string jsonResponse = await client.GetStringAsync(
-        //        String.Format(
-        //            "{0}://{1}:{2}{3}/session_execution/student/{4}/remaining_sessions",
-        //            this.backendProtocol,
-        //            this.backendHost,
-        //            this.backendPort,
-        //            backendPrefix,
-        //            iamSession.user.username
-        //        )
-        //    );
-        //    var settings = new JsonSerializerSettings
-        //    {
-        //        NullValueHandling = NullValueHandling.Ignore,
-        //        MissingMemberHandling = MissingMemberHandling.Ignore
-        //    };
-        //    Session[] sessions = JsonConvert.DeserializeObject<Session[]>(jsonResponse, settings);
-        //    return sessions[0];
-        //}
 
         async public Task<Session> GetStudentActiveSession()
         {
