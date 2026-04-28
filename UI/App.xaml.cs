@@ -1,9 +1,12 @@
-﻿using System.Diagnostics;
+﻿using Core.Repositories;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Forms;
 using Application = System.Windows.Application;
+
+using Core.Models;
 
 namespace UI
 {
@@ -19,7 +22,7 @@ namespace UI
         // List to track active windows
         private static List<TrafficLightWindow> activeWindows = new List<TrafficLightWindow>();
 
-        private TestWindow? _testWindow;
+        private SettingsView? _settingsView;
 
         private NotifyIcon? _trayIcon;
 
@@ -35,8 +38,11 @@ namespace UI
 
             Trace.Listeners.Add(new TextWriterTraceListener(logPath));
             Trace.AutoFlush = true;
-
+            Trace.WriteLine("----------------------------------------------------");
             Trace.WriteLine("Application started at " + DateTime.Now);
+
+            var settings = Settings.Current; // Force loading settings at startup
+            Trace.WriteLine("Loaded settings: Environment = " + settings.Environment);
 
             SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
             base.OnStartup(e);
@@ -63,7 +69,6 @@ namespace UI
             }
 
             _trayIcon.DoubleClick += (_, _) => ShowMainWindow();
-
 
             // ------------------------------------------------------------------
             // Main App
@@ -97,7 +102,7 @@ namespace UI
             var menu = new ContextMenuStrip();
 
             menu.Items.Add("Show Traffic Light", null, (_, _) => ShowMainWindow());
-            menu.Items.Add("Verify Data Collection", null, (_, _) => ShowTestWindow());
+            menu.Items.Add("Settings", null, (_, _) => ShowSettings());
             menu.Items.Add("Exit", null, (_, _) => ExitApp());
 
             return menu;
@@ -119,17 +124,17 @@ namespace UI
             }
         }
 
-        private void ShowTestWindow()
+        private void ShowSettings()
         {
-            if (_testWindow == null)
+            if (_settingsView == null)
             {
-                _testWindow = new TestWindow();
-                _testWindow.Closed += (s, e) => { _testWindow = null; };
-                _testWindow.Show();
+                _settingsView = new SettingsView();
+                _settingsView.Closed += (s, e) => { _settingsView = null; };
+                _settingsView.Show();
             }
             else
             {
-                _testWindow.Activate();
+                _settingsView.Activate();
             }
         }
 
