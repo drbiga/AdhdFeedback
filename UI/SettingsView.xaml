@@ -6,9 +6,8 @@
         xmlns:local="clr-namespace:UI"
         xmlns:core="clr-namespace:Core.Models;assembly=Core"
         mc:Ignorable="d"
-        Title="SettingsView" Height="450" Width="800">
+        Title="SettingsVeiew" Height="450" Width="800">
     <Grid>
-
         <Frame Name="Frame" Source="SettingsLoginPage.xaml" NavigationUIVisibility="Hidden" />
     </Grid>
 </Window>

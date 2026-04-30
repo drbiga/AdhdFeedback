@@ -29,10 +29,8 @@ namespace UI
 
         private void Unlock_Click(object sender, RoutedEventArgs e)
         {
-            // The "Simple/Hardcoded" way
-            if (PassBox.Password == "1234")
+            if (PassBox.Password == "Bigabiga@123")
             {
-                // "this.NavigationService" is the magic tool that swaps the page
                 this.NavigationService.Navigate(new SettingsPage());
             }
             else

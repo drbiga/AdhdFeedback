@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using Application = System.Windows.Application;
 
 using Core.Models;
+using UI.Services;
 
 namespace UI
 {
@@ -25,6 +26,8 @@ namespace UI
         private SettingsView? _settingsView;
 
         private NotifyIcon? _trayIcon;
+
+        public ISessionExecutionService SessionExecutionService { get; set; } = MockSessionExecutionService.GetOrCreate();
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -110,12 +113,6 @@ namespace UI
 
         private void ShowMainWindow()
         {
-            //if (Current.MainWindow == null)
-            //    return;
-
-            //Current.MainWindow.Show();
-            //Current.MainWindow.WindowState = WindowState.Normal;
-            //Current.MainWindow.Activate();
             foreach (var window in activeWindows)
             {
                 window.Show();

@@ -1,14 +1,19 @@
-﻿using Newtonsoft.Json;
-using System.Net;
-using System.Net.Http.Headers;
-using System.Net.Http;
+﻿//using Core.Models;
+using Newtonsoft.Json;
 using System.Diagnostics;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 
+using Core.Models;
 using UI.Models;
+
+using Feedback = UI.Models.Feedback;
+using IamSession = UI.Models.IamSession;
 
 namespace UI.Services
 {
-    class MockSessionExecutionService
+    class MockSessionExecutionService : ISessionExecutionService
     {
         private static MockSessionExecutionService instance;
         private List<Feedback> feedbackOptions;
@@ -127,6 +132,36 @@ namespace UI.Services
             Debug.WriteLine(message);
             Trace.WriteLine(message);
             return result;
+        }
+
+        public void UpdateServerParamsFromSettings()
+        {
+            Debug.WriteLine("[ MockSessionExecutionService.UpdateServerParamsFromSettings ] Setting the server params: " + Settings.Current.ServerParams.ToString());
+        }
+
+        public bool SessionIsSet()
+        {
+            // IAM session
+            return true;
+        }
+
+        public IamSession GetIamSession()
+        {
+            return new IamSession()
+            {
+                user = new IamSession.User()
+                {
+                    username = "mock_user",
+                    role = "student"
+                },
+                ip_address = "localhost",
+                token = "some_random_token"
+            };
+        }
+
+        async public Task<Session> GetStudentActiveSession()
+        {
+            throw new NotImplementedException();
         }
     }
 }

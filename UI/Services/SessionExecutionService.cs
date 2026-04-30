@@ -6,6 +6,10 @@ using System.Diagnostics;
 
 using UI.Models;
 using System.Threading.Tasks;
+using Core.Models;
+
+using IamSession = UI.Models.IamSession;
+using Feedback = UI.Models.Feedback;
 
 namespace UI.Services
 {
@@ -43,25 +47,18 @@ namespace UI.Services
         public Session active_session;
     }
 
-    public class SessionExecutionService
+    public class SessionExecutionService : ISessionExecutionService
     {
-        private enum BackendChoice
-        {
-            DEV,
-            STAGING,
-            PRODUCTION
-        }
 
         private static SessionExecutionService instance;
-        private BackendChoice backendChoice;
         private string backendProtocol;
         private string backendHost;
         private int backendPort;
         private string backendPrefix;
         private string localServerHost;
         private int localServerPort;
-        private IamSession iamSession;
-        private Feedback currentFeedback;
+        private IamSession? iamSession;
+        private Feedback? currentFeedback;
 
         private bool sessionHasFeedback;
 
@@ -86,22 +83,24 @@ namespace UI.Services
             this.iamSession = null;
             this.currentFeedback = null;
 
-            // ------------------------------------------------------------------------
-            // Local backend config for dev purposes
-#if DEBUG
-            UseDevBackend();
-#endif
-            // ------------------------------------------------------------------------
-            // Staging backend config
-#if STAGING
-            UseStagingBackend();
-#endif
+            UpdateServerParamsFromSettings();
 
-            // ------------------------------------------------------------------------
-            // Production backend config
-#if RELEASE
-            UseProductionBackend();
-#endif
+//            // ------------------------------------------------------------------------
+//            // Local backend config for dev purposes
+//#if DEBUG
+//            UseDevBackend();
+//#endif
+//            // ------------------------------------------------------------------------
+//            // Staging backend config
+//#if STAGING
+//            UseStagingBackend();
+//#endif
+
+//            // ------------------------------------------------------------------------
+//            // Production backend config
+//#if RELEASE
+//            UseProductionBackend();
+//#endif
 
             // ------------------------------------------------------------------------
             localServerHost = "localhost";
@@ -112,6 +111,17 @@ namespace UI.Services
             this.sessionHasFeedback = true;
 
             InitializeIamSession();
+        }
+
+        public void UpdateServerParamsFromSettings()
+        {
+            var serverParams = Settings.Current.ServerParams;
+            this.backendProtocol = serverParams.BackendProtocol;
+            this.backendHost = serverParams.BackendHost;
+            this.backendPort = serverParams.BackendPort;
+            this.backendPrefix = serverParams.BackendPrefix;
+
+            Debug.WriteLine(serverParams);
         }
 
         private async Task InitializeIamSession()
@@ -126,11 +136,12 @@ namespace UI.Services
                     {
                         continue;
                     }
-                    else if (this.iamSession == null && iamSession != null)
+                    if (this.iamSession == null)
                     {
                         this.iamSession = iamSession;
+                        continue;
                     }
-                    else if (iamSession != null && iamSession.token.Equals(this.iamSession.token))
+                    if (!iamSession.token.Equals(this.iamSession.token))
                     {
                         this.iamSession = iamSession;
                     }
@@ -146,31 +157,31 @@ namespace UI.Services
             }
         }
 
-        public void UseDevBackend()
-        {
-            this.backendProtocol = "http";
-            this.backendHost = "localhost";
-            this.backendPort = 8000;
-            this.backendPrefix = "/";
-        }
+        //public void UseDevBackend()
+        //{
+        //    this.backendProtocol = "http";
+        //    this.backendHost = "localhost";
+        //    this.backendPort = 8000;
+        //    this.backendPrefix = "/";
+        //}
 
-        public void UseStagingBackend()
-        {
-            this.backendProtocol = "https";
-            this.backendHost = "testlsuadhd.centralus.cloudapp.azure.com";
-            this.backendPort = 443;
-            this.backendPrefix = "/api";
-            System.Windows.MessageBox.Show("Switched to staging backend");
-        }
+        //public void UseStagingBackend()
+        //{
+        //    this.backendProtocol = "https";
+        //    this.backendHost = "testlsuadhd.centralus.cloudapp.azure.com";
+        //    this.backendPort = 443;
+        //    this.backendPrefix = "/api";
+        //    System.Windows.MessageBox.Show("Switched to staging backend");
+        //}
 
-        public void UseProductionBackend()
-        {
-            this.backendProtocol = "https";
-            this.backendHost = "lsuadhd.centralus.cloudapp.azure.com";
-            this.backendPort = 443;
-            this.backendPrefix = "/api";
-            System.Windows.MessageBox.Show("Switched to staging backend");
-        }
+        //public void UseProductionBackend()
+        //{
+        //    this.backendProtocol = "https";
+        //    this.backendHost = "lsuadhd.centralus.cloudapp.azure.com";
+        //    this.backendPort = 443;
+        //    this.backendPrefix = "/api";
+        //    System.Windows.MessageBox.Show("Switched to staging backend");
+        //}
 
         private async Task<IamSession> GetCurrentIamSession()
         {

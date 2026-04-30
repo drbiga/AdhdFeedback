@@ -9,34 +9,123 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="SettingsPage">
 
-    <Grid>
-        <Label Content="Environment" HorizontalAlignment="Left" Margin="70,114,0,0" VerticalAlignment="Top"/>
-        <ComboBox
-            x:Name="EnvironmentComboBox"
-            HorizontalAlignment="Left"
-            Margin="172,118,0,0"
-            VerticalAlignment="Top"
-            Width="120"
-            ItemsSource="{Binding EnvironmentOptionsDisplayNameList}"
-            SelectedItem="{Binding Source={x:Static core:Settings.Current}, 
-                                         Path=Environment, 
-                                         Mode=TwoWay}"
-        />
-        <Rectangle
-            HorizontalAlignment="Center"
-            Height="74"
-            Margin="0,1,0,0"
-            Stroke="#333"
-            Fill="#333"
-            VerticalAlignment="Top"
-            Width="800"/>
-        <TextBlock
-            HorizontalAlignment="Left"
-            Margin="70,23,0,0"
-            TextWrapping="Wrap"
-            Text="Settings"
-            FontSize="24"
-            Foreground="White"
-            VerticalAlignment="Top"/>
-    </Grid>
+    <Page.Resources>
+        <Style TargetType="Label">
+            <Setter Property="Foreground" Value="Azure" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Margin" Value="0,10,10,10" />
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Margin" Value="0,10,0,10" />
+            <Setter Property="MinWidth" Value="300" />
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="5,0,5,0" />
+        </Style>
+    </Page.Resources>
+
+    <DockPanel>
+        <Border
+            Background="#111"
+            Padding="50,25,0,25"
+            DockPanel.Dock="Top"
+        >
+            <TextBlock
+                HorizontalAlignment="Left"
+                TextWrapping="Wrap"
+                FontSize="24"
+                Foreground="White"
+                VerticalAlignment="Top"
+               >
+                Settings
+            </TextBlock>
+        </Border>
+        <Border Padding="50,0,0,0" Background="#222">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Label
+                Grid.Row="0" Grid.Column="0"
+                FontSize="22"
+                FontWeight="Bold"
+             >
+                    Environment
+                </Label>
+
+                <ComboBox
+                x:Name="EnvironmentComboBox"
+                Grid.Row="0" Grid.Column="1"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Left"
+                MinWidth="100"
+                ItemsSource="{Binding EnvironmentOptionsDisplayNameList}"
+                SelectedItem="{Binding Settings.Environment}"
+                SelectionChanged="ComboBox_SelectionChanged"
+            />
+
+                <!--==========================-->
+                <!-- BACKEND PROTOCOL -->
+                <Label
+                Grid.Row="1" Grid.Column="0"
+            >
+                    Backend Protocol:
+                </Label>
+                <TextBox
+                Grid.Row="1" Grid.Column="1"
+                x:Name="backendProtocolText"
+                IsReadOnly="{Binding IsNotEditing}"
+            />
+
+                <!--==========================-->
+                <!-- BACKEND HOST -->
+                <Label
+                Grid.Row="2" Grid.Column="0"
+            >
+                    Backend Host:
+                </Label>
+                <TextBox
+                Grid.Row="2" Grid.Column="1"
+                x:Name="backendHostText"
+                IsReadOnly="{Binding IsNotEditing}"
+            />
+
+                <!--==========================-->
+                <!-- BACKEND PORT -->
+                <Label
+                Grid.Row="3" Grid.Column="0"
+            >
+                    Backend Port:
+                </Label>
+                <TextBox
+                Grid.Row="3" Grid.Column="1"
+                x:Name="backendPortText"
+                IsReadOnly="{Binding IsNotEditing}"
+            />
+                <!--==========================-->
+                <!-- BACKEND PREFIX -->
+                <Label
+                Grid.Row="4" Grid.Column="0"
+            >
+                    Backend Prefix:
+                </Label>
+                <TextBox
+                Grid.Row="4" Grid.Column="1"
+                x:Name="backendPrefixText"
+                IsReadOnly="{Binding IsNotEditing}"
+            />
+            </Grid>
+        </Border>
+    </DockPanel>
 </Page>

@@ -10,6 +10,8 @@ namespace UI.ViewModels
 {
     internal class TrafficLightViewModel : INotifyPropertyChanged
     {
+        private readonly ISessionExecutionService sessionExecutionService;
+
         #region Attributes
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -78,6 +80,8 @@ namespace UI.ViewModels
         #region methods
         public TrafficLightViewModel()
         {
+            this.sessionExecutionService = ((App) System.Windows.Application.Current).SessionExecutionService;
+
             colorTimer.Tick += LightTick;
             colorTimer.Start();
 
@@ -105,10 +109,7 @@ namespace UI.ViewModels
             Feedback state;
             try
             {
-                //state = GetCurrentFeedback();
-                //SessionExecutionService s = SessionExecutionService.GetOrCreate();
-                MockSessionExecutionService s = MockSessionExecutionService.GetOrCreate();
-                state = s.GetCurrentFeedback();
+                state = sessionExecutionService.GetCurrentFeedback();
                 IsReady = true;
                 if (state == null)
                 {
@@ -147,7 +148,7 @@ namespace UI.ViewModels
             // It is possible to not have any feedbacks simply because the
             // session has not started yet.
             // In this case, we just show green.
-            if (MockSessionExecutionService.GetOrCreate().SessionHasFeedback())
+            if (sessionExecutionService.SessionHasFeedback())
             {
                 if (!Enabled)
                 {
