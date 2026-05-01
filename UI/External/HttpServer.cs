@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Application = System.Windows.Application;
 
+using UI.Views;
+
 namespace UI
 {
     public static class HttpServer

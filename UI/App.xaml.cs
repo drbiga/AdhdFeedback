@@ -1,14 +1,15 @@
 ﻿using CommunityToolkit.Mvvm.DependencyInjection;
 using Core.Models;
-using Core.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
-using System.Windows.Forms;
+
 using UI.Services;
+using UI.Views;
 using UI.ViewModels;
+
 using Application = System.Windows.Application;
 
 namespace UI

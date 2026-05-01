@@ -10,7 +10,7 @@ using UI.ViewModels;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using LightColor = UI.ViewModels.TrafficLightViewModel.LightColor;
 
-namespace UI
+namespace UI.Views
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

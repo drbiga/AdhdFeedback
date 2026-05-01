@@ -13,6 +13,7 @@ using System.Windows;
 using CommunityToolkit.Mvvm.DependencyInjection;
 
 using UI.Services;
+using UI.Views;
 
 namespace UI.ViewModels
 {

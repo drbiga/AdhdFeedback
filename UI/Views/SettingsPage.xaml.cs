@@ -9,7 +9,7 @@ using UI.Services;
 using UI.ViewModels;
 using Application = System.Windows.Application;
 
-namespace UI
+namespace UI.Views
 {
     /// <summary>
     /// Interaction logic for SettingsPage.xaml

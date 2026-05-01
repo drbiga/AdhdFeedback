@@ -56,14 +56,39 @@ namespace UI.ViewModels
 
         public bool IsNotEditing => !IsEditing;
 
+        private bool _useRealSessionExecutionService = false;
+        public bool UseRealSessionExecutionService
+        {
+            get => _useRealSessionExecutionService;
+            set
+            {
+                if (_useRealSessionExecutionService == value)
+                    return;
+                _useRealSessionExecutionService = value;
+                UseMockSessionExecutionService = !value;
+                OnPropertyChanged(nameof(UseRealSessionExecutionService));
+                Debug.WriteLine("[ SettingsViewModel.UseRealSessionExecutionService[set] ] Setting value=" + value);
+                Trace.WriteLine("[ SettingsViewModel.UseRealSessionExecutionService[set] ] Setting value=" + value);
+            }
+        }
+        private bool _useMockSessionExecutionService = true;
+        public bool UseMockSessionExecutionService
+        {
+            get => _useMockSessionExecutionService;
+            set
+            {
+                if (_useMockSessionExecutionService == value)
+                    return;
+                _useMockSessionExecutionService = value;
+                UseRealSessionExecutionService = !value;
+                OnPropertyChanged(nameof(UseMockSessionExecutionService));
+                Debug.WriteLine("[ SettingsViewModel.UseMockSessionExecutionService[set] ] Setting value=" + value);
+                Trace.WriteLine("[ SettingsViewModel.UseMockSessionExecutionService[set] ] Setting value=" + value);
+            }
+        }
+
         public SettingsViewModel()
         {
-            //if (s == null)
-            //{
-            //    Debug.WriteLine("[ SettingsViewModel.SettingsViewModel ] Error: SessionExecutionService is null");
-            //    throw new ArgumentNullException(nameof(s), "SessionExecutionService cannot be null");
-            //}
-            //this.sessionExecutionService = s;
             this.sessionExecutionService = MockSessionExecutionService.GetOrCreate();
 
             _settings = Settings.Current;

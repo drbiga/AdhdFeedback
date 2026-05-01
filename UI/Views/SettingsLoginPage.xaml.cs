@@ -2,7 +2,7 @@
 
 using UI.ViewModels;
 
-namespace UI
+namespace UI.Views
 {
     /// <summary>
     /// Interaction logic for SettingsLoginPage.xaml
