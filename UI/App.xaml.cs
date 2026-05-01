@@ -96,11 +96,19 @@ namespace UI
             //    activeWindows.Add(window); // Add the window to the active list
             //}
             // Configure your services
-            Ioc.Default.ConfigureServices(
-                new ServiceCollection()
+            IServiceCollection services = new ServiceCollection();
+            if (settings.UseRealSessionExecutionService)
+            {
+                Trace.WriteLine("[ App.xaml.cs ] Using REAL SessionExecutionService");
+                services.AddSingleton<ISessionExecutionService, SessionExecutionService>();
+            }
+            else
+            {
+                Trace.WriteLine("[ App.xaml.cs ] Using MOCK SessionExecutionService");
+                services.AddSingleton<ISessionExecutionService, MockSessionExecutionService>();
+            }
+            services
                 .AddSingleton<INavigationService, UI.Services.NavigationService>()
-                .AddTransient<ISessionExecutionService, MockSessionExecutionService>()
-
                 .AddTransient<SettingsLoginViewModel>()
                 .AddTransient<SettingsLoginPage>(s => new SettingsLoginPage(s.GetRequiredService<SettingsLoginViewModel>()))
 
@@ -108,14 +116,13 @@ namespace UI
                 .AddTransient<SettingsPage>(s => new SettingsPage(s.GetRequiredService<SettingsViewModel>()))
 
                 .AddTransient<SettingsView>()
-
+                .AddTransient<TrafficLightViewModel>(s => new TrafficLightViewModel(s.GetRequiredService<ISessionExecutionService>()))
                 .AddTransient<TrafficLightWindow>(s => new TrafficLightWindow()
                 {
                     WindowStartupLocation = WindowStartupLocation.Manual,
                     screen = Screen.AllScreens.FirstOrDefault()
-                })
-
-                .BuildServiceProvider());
+                });
+            Ioc.Default.ConfigureServices(services.BuildServiceProvider());
 
             var mainWindow = Ioc.Default.GetRequiredService<TrafficLightWindow>();
             mainWindow.setWindowId(0);

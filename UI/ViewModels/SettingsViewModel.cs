@@ -56,7 +56,7 @@ namespace UI.ViewModels
 
         public bool IsNotEditing => !IsEditing;
 
-        private bool _useRealSessionExecutionService = false;
+        private bool _useRealSessionExecutionService;
         public bool UseRealSessionExecutionService
         {
             get => _useRealSessionExecutionService;
@@ -69,9 +69,11 @@ namespace UI.ViewModels
                 OnPropertyChanged(nameof(UseRealSessionExecutionService));
                 Debug.WriteLine("[ SettingsViewModel.UseRealSessionExecutionService[set] ] Setting value=" + value);
                 Trace.WriteLine("[ SettingsViewModel.UseRealSessionExecutionService[set] ] Setting value=" + value);
+                _settings.UseRealSessionExecutionService = value;
+                OnStartupSettingChanged();
             }
         }
-        private bool _useMockSessionExecutionService = true;
+        private bool _useMockSessionExecutionService;
         public bool UseMockSessionExecutionService
         {
             get => _useMockSessionExecutionService;
@@ -92,6 +94,34 @@ namespace UI.ViewModels
             this.sessionExecutionService = MockSessionExecutionService.GetOrCreate();
 
             _settings = Settings.Current;
+            _useRealSessionExecutionService = _settings.UseRealSessionExecutionService;
+            _useMockSessionExecutionService = !_useRealSessionExecutionService;
+        }
+
+        private void OnStartupSettingChanged()
+        {
+            var result = System.Windows.MessageBox.Show(
+                "This setting requires a restart to take effect. Restart now?",
+                "Restart Required",
+                MessageBoxButton.YesNo,
+                System.Windows.MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                RestartApplication();
+            }
+        }
+
+        public void RestartApplication()
+        {
+            // 1. Get the path to the current executable
+            string appPath = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
+
+            // 2. Start a new instance of the app
+            System.Diagnostics.Process.Start(appPath);
+
+            // 3. Shut down the current instance immediately
+            System.Windows.Application.Current.Shutdown();
         }
     }
 }

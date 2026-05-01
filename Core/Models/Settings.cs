@@ -115,6 +115,17 @@ namespace Core.Models
             }
         }
 
+        private bool _useRealSessionExecutionService;
+        public bool UseRealSessionExecutionService
+        {
+            get => _useRealSessionExecutionService;
+            set
+            {
+                _useRealSessionExecutionService = value;
+                _repo.SaveSettingSync("use_real_session_execution_service", value.ToString());
+            }
+        }
+
         private Settings()
         {
             Debug.WriteLine("[ Settings ] Constructor called");
@@ -150,6 +161,12 @@ namespace Core.Models
                     BackendPrefix = backendPrefix
                 };
             }
+
+            var val = _repo.LoadSettingSync("use_real_session_execution_service");
+            if (val == null)
+                UseRealSessionExecutionService = false;
+            else
+                _useRealSessionExecutionService = bool.Parse(val);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

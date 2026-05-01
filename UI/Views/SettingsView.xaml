@@ -11,18 +11,4 @@
     <Grid>
         <Frame Name="Frame" NavigationUIVisibility="Hidden" />
     </Grid>
-
-    <!--<Grid>
-        <StackPanel Visibility="{Binding FormVisibility}" VerticalAlignment="Center" HorizontalAlignment="Center">
-            <Label Foreground="Black">A password is required:</Label>
-            <TextBox Text="{Binding Password}" />
-            <Button Command="{Binding AuthenticateCommand}">
-                Submit
-            </Button>
-        </StackPanel>
-
-        <StackPanel Visibility="{Binding SettingsVisibility}" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock>Hello World</TextBlock>
-        </StackPanel>
-    </Grid>-->
 </Window>

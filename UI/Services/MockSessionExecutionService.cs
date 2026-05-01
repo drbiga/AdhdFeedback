@@ -30,7 +30,7 @@ namespace UI.Services
             return instance;
         }
 
-        private MockSessionExecutionService()
+        public MockSessionExecutionService()
         {
             Feedback focusedFeedback = new Feedback
             {

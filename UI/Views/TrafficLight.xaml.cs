@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using CommunityToolkit.Mvvm.DependencyInjection;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media;
@@ -51,7 +52,7 @@ namespace UI.Views
         {
             InitializeComponent();
             
-            TrafficLightViewModel vm = new TrafficLightViewModel();
+            TrafficLightViewModel vm = Ioc.Default.GetRequiredService<TrafficLightViewModel>();
             vm.PropertyChanged += Vm_PropertyChanged;
 
             DataContext = vm;

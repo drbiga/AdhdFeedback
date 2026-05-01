@@ -78,7 +78,7 @@ namespace UI.Services
             return instance;
         }
 
-        private SessionExecutionService()
+        public SessionExecutionService()
         {
             this.iamSession = null;
             this.currentFeedback = null;
