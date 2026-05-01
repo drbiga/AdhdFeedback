@@ -1,22 +1,28 @@
-﻿using Core.Models;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
+
+
+// Commands
+using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+
+using Core.Models;
+
 using UI.Services;
 
 namespace UI.ViewModels
 {
-    public class SettingsViewModel : INotifyPropertyChanged
+    public partial class SettingsViewModel : ObservableObject, INotifyPropertyChanged
     {
-        private readonly ISessionExecutionService sessionExecutionService;
-
         public event PropertyChangedEventHandler? PropertyChanged;
+        private void OnPropertyChanged([CallerMemberName] string name = null)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
+        private readonly ISessionExecutionService sessionExecutionService;
+        
         public List<string> EnvironmentOptionsDisplayNameList { get; set; } = new List<string>()
         {
             Env.Development,
@@ -49,7 +55,18 @@ namespace UI.ViewModels
         }
 
         public bool IsNotEditing => !IsEditing;
-        private void OnPropertyChanged([CallerMemberName] string name = null)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+        public SettingsViewModel()
+        {
+            //if (s == null)
+            //{
+            //    Debug.WriteLine("[ SettingsViewModel.SettingsViewModel ] Error: SessionExecutionService is null");
+            //    throw new ArgumentNullException(nameof(s), "SessionExecutionService cannot be null");
+            //}
+            //this.sessionExecutionService = s;
+            this.sessionExecutionService = MockSessionExecutionService.GetOrCreate();
+
+            _settings = Settings.Current;
+        }
     }
 }

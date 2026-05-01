@@ -80,7 +80,8 @@ namespace UI.ViewModels
         #region methods
         public TrafficLightViewModel()
         {
-            this.sessionExecutionService = ((App) System.Windows.Application.Current).SessionExecutionService;
+            //this.sessionExecutionService = ((App) System.Windows.Application.Current).SessionExecutionService;
+            this.sessionExecutionService = MockSessionExecutionService.GetOrCreate();
 
             colorTimer.Tick += LightTick;
             colorTimer.Start();

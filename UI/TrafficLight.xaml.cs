@@ -4,10 +4,10 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
-using UI.Util;
 using UI.Services;
+using UI.Util;
 using UI.ViewModels;
-
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using LightColor = UI.ViewModels.TrafficLightViewModel.LightColor;
 
 namespace UI
@@ -16,7 +16,7 @@ namespace UI
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     ///
-    public partial class TrafficLightWindow : Window
+    public partial class TrafficLightWindow : System.Windows.Window
     {
         /// <summary>
         ///  Window ID, used to identify which screen this window belongs to.
@@ -62,6 +62,13 @@ namespace UI
             beepPlayer.Open(new Uri(@"Media\Beep.mp3", UriKind.Relative));
             beepTimer = new DispatcherTimer() { Interval = TimeSpan.FromSeconds(BEEP_TICK_INTERVAL) };
             beepTimer.Tick += BeepTick;
+        }
+
+        public void Show()
+        {
+            if (WindowStartupLocation == null)
+                throw new Exception("[ TrafficLightWindow.Show ] WindowStartupLocation is null, cannot determine initial position");
+            base.Show();
         }
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
@@ -236,6 +243,11 @@ namespace UI
         // Method to move the window
         public void Move()
         {
+            if (WindowStartupLocation == null)
+                throw new Exception("[ TrafficLightWindow.Move ] WindowStartupLocation is null, cannot move");
+            if (screen == null)
+                throw new Exception("[ TrafficLightWindow.Move ] The screen attribute is null, cannot move");
+
             this.positionState.Next();
         }
 

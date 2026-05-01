@@ -1,13 +1,15 @@
-﻿using Core.Repositories;
+﻿using CommunityToolkit.Mvvm.DependencyInjection;
+using Core.Models;
+using Core.Repositories;
+using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Forms;
-using Application = System.Windows.Application;
-
-using Core.Models;
 using UI.Services;
+using UI.ViewModels;
+using Application = System.Windows.Application;
 
 namespace UI
 {
@@ -27,8 +29,6 @@ namespace UI
 
         private NotifyIcon? _trayIcon;
 
-        public ISessionExecutionService SessionExecutionService { get; set; } = MockSessionExecutionService.GetOrCreate();
-
         protected override void OnStartup(StartupEventArgs e)
         {
             string logDir = Path.Combine(
@@ -44,7 +44,7 @@ namespace UI
             Trace.WriteLine("----------------------------------------------------");
             Trace.WriteLine("Application started at " + DateTime.Now);
 
-            var settings = Settings.Current; // Force loading settings at startup
+            var settings = Settings.Current;
             Trace.WriteLine("Loaded settings: Environment = " + settings.Environment);
 
             SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
@@ -76,24 +76,51 @@ namespace UI
             // ------------------------------------------------------------------
             // Main App
             // Iterate over all connected
-            int wid = 0;
-            foreach (var screen in Screen.AllScreens)
-            {
-                // Create a new window on this screen
-                var window = new TrafficLightWindow
+            //int wid = 0;
+            //foreach (var screen in Screen.AllScreens)
+            //{
+            //    // Create a new window on this screen
+            //    var window = new TrafficLightWindow
+            //    {
+            //        WindowStartupLocation = WindowStartupLocation.Manual,
+            //        screen = screen
+            //    };
+            //    window.setWindowId(wid);
+            //    wid += 1;
+            //    window.Move();
+            //    //window.SetGreen();
+
+            //    // Show the window
+            //    window.Show();
+            //    activeWindows.Add(window); // Add the window to the active list
+            //}
+            // Configure your services
+            Ioc.Default.ConfigureServices(
+                new ServiceCollection()
+                .AddSingleton<INavigationService, UI.Services.NavigationService>()
+                .AddTransient<ISessionExecutionService, MockSessionExecutionService>()
+
+                .AddTransient<SettingsLoginViewModel>()
+                .AddTransient<SettingsLoginPage>(s => new SettingsLoginPage(s.GetRequiredService<SettingsLoginViewModel>()))
+
+                .AddTransient<SettingsViewModel>()
+                .AddTransient<SettingsPage>(s => new SettingsPage(s.GetRequiredService<SettingsViewModel>()))
+
+                .AddTransient<SettingsView>()
+
+                .AddTransient<TrafficLightWindow>(s => new TrafficLightWindow()
                 {
                     WindowStartupLocation = WindowStartupLocation.Manual,
-                    screen = screen
-                };
-                window.setWindowId(wid);
-                wid += 1;
-                window.Move();
-                //window.SetGreen();
+                    screen = Screen.AllScreens.FirstOrDefault()
+                })
 
-                // Show the window
-                window.Show();
-                activeWindows.Add(window); // Add the window to the active list
-            }
+                .BuildServiceProvider());
+
+            var mainWindow = Ioc.Default.GetRequiredService<TrafficLightWindow>();
+            mainWindow.setWindowId(0);
+            mainWindow.Move();
+            activeWindows.Add(mainWindow);
+            mainWindow.Show();
             // ------------------------------------------------------------------
             // Http Server
             HttpServer.Start();
@@ -125,7 +152,7 @@ namespace UI
         {
             if (_settingsView == null)
             {
-                _settingsView = new SettingsView();
+                _settingsView = Ioc.Default.GetRequiredService<SettingsView>();
                 _settingsView.Closed += (s, e) => { _settingsView = null; };
                 _settingsView.Show();
             }

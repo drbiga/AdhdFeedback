@@ -6,13 +6,56 @@
       xmlns:local="clr-namespace:UI"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="SettingsLoginPage">
+      Title="Settings Login">
 
-    <Grid>
-        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-            <TextBlock Text="Enter Password:" Margin="5"/>
-            <PasswordBox x:Name="PassBox" Width="150" Margin="5"/>
-            <Button Content="Unlock" Click="Unlock_Click" Width="75" Margin="5"/>
-        </StackPanel>
+    <Grid Background="#eee">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Border
+            VerticalAlignment="Center" HorizontalAlignment="Center"
+            BorderBrush="#111"
+            BorderThickness="0"
+            CornerRadius="5"
+            Padding="20,10,20,10"
+            Background="White"
+            >
+            <StackPanel HorizontalAlignment="Left">
+                <TextBlock Margin="0,0,0,10" FontSize="32" FontWeight="Light">Settings Login</TextBlock>
+                <TextBlock Text="Enter Password:" Margin="5"/>
+                <PasswordBox x:Name="PassBox" Margin="5" HorizontalAlignment="Stretch">
+                    <PasswordBox.Template>
+                        <ControlTemplate TargetType="PasswordBox">
+                            <Border CornerRadius="1"
+                                BorderThickness="1"
+                                BorderBrush="#111">
+                                <ScrollViewer Margin="0" x:Name="PART_ContentHost"/>
+                            </Border>
+                        </ControlTemplate>
+                    </PasswordBox.Template>
+                </PasswordBox>
+                <Button
+                    Command="{Binding AuthenticateCommand}"
+                    CommandParameter="{Binding ElementName=PassBox}"
+                    Width="75" Margin="5"
+                    HorizontalAlignment="Left"
+                >
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border CornerRadius="2"
+                                BorderThickness="1"
+                                BorderBrush="#111"
+                                Cursor="Hand">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                    Submit
+                </Button>
+            </StackPanel>
+        </Border>
+        <Border Grid.Column="1" Background="#333" />
     </Grid>
 </Page>
