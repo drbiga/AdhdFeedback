@@ -88,6 +88,7 @@ namespace UI.ViewModels
             enabledTimer.Tick += (s, e) =>
             {
                 //Enabled = !Enabled;
+                OnPropertyChanged(nameof(Enabled));
             };
             enabledTimer.Start();
 
