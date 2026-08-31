@@ -15,9 +15,10 @@ using CommunityToolkit.Mvvm.DependencyInjection;
 using UI.Services;
 using UI.Views;
 
+
 namespace UI.ViewModels
 {
-    public partial class SettingsLoginViewModel : ObservableObject, INotifyPropertyChanged
+    public partial class SettingsLoginViewModel : ViewModelBase, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         private void OnPropertyChanged([CallerMemberName] string name = null)
@@ -52,20 +53,29 @@ namespace UI.ViewModels
                 return;
             }
             Password = passBox.Password;
-            IsAuthenticated = Password == "123";
+            IsAuthenticated = Password == "Bigabiga@123";
             string message = "[ SettingsViewModel.Authenticate ] Authenticate method called. Result is " + IsAuthenticated;
             Debug.WriteLine(message);
             Trace.WriteLine(message);
             if (IsAuthenticated)
             {
-                _navigationService.NavigateTo(Ioc.Default.GetRequiredService<SettingsPage>());
+                _navigationService.NavigateTo<SettingsMainViewModel>();
             }
         }
 
         public Visibility FormVisibility => IsAuthenticated ? Visibility.Collapsed : Visibility.Visible;
         public Visibility SetingsVisibility => IsAuthenticated ? Visibility.Visible : Visibility.Collapsed;
 
-        private INavigationService _navigationService;
-        public SettingsLoginViewModel(INavigationService nav) => _navigationService = nav;
+        private ISettingsNavigationService _navigationService;
+        public SettingsLoginViewModel(ISettingsNavigationService nav)
+        {
+            if (nav == null)
+            {
+                string message = "[ SettingsLoginViewModel ] Navigation service cannot be null";
+                Debug.WriteLine(message);
+                throw new ArgumentNullException(message);
+            }
+            _navigationService = nav;
+        }
     }
 }

@@ -85,23 +85,6 @@ namespace UI.Services
 
             UpdateServerParamsFromSettings();
 
-//            // ------------------------------------------------------------------------
-//            // Local backend config for dev purposes
-//#if DEBUG
-//            UseDevBackend();
-//#endif
-//            // ------------------------------------------------------------------------
-//            // Staging backend config
-//#if STAGING
-//            UseStagingBackend();
-//#endif
-
-//            // ------------------------------------------------------------------------
-//            // Production backend config
-//#if RELEASE
-//            UseProductionBackend();
-//#endif
-
             // ------------------------------------------------------------------------
             localServerHost = "localhost";
             localServerPort = 8001;
@@ -157,32 +140,6 @@ namespace UI.Services
             }
         }
 
-        //public void UseDevBackend()
-        //{
-        //    this.backendProtocol = "http";
-        //    this.backendHost = "localhost";
-        //    this.backendPort = 8000;
-        //    this.backendPrefix = "/";
-        //}
-
-        //public void UseStagingBackend()
-        //{
-        //    this.backendProtocol = "https";
-        //    this.backendHost = "testlsuadhd.centralus.cloudapp.azure.com";
-        //    this.backendPort = 443;
-        //    this.backendPrefix = "/api";
-        //    System.Windows.MessageBox.Show("Switched to staging backend");
-        //}
-
-        //public void UseProductionBackend()
-        //{
-        //    this.backendProtocol = "https";
-        //    this.backendHost = "lsuadhd.centralus.cloudapp.azure.com";
-        //    this.backendPort = 443;
-        //    this.backendPrefix = "/api";
-        //    System.Windows.MessageBox.Show("Switched to staging backend");
-        //}
-
         private async Task<IamSession> GetCurrentIamSession()
         {
             HttpClient client = new HttpClient();
@@ -233,17 +190,16 @@ namespace UI.Services
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", iamSession.token);
             try
             {
-
-                string jsonResponse = await client.GetStringAsync(
-                    String.Format(
-                        "{0}://{1}:{2}{3}/session_execution/student/{4}/session/feedback",
-                        this.backendProtocol,
-                        this.backendHost,
-                        this.backendPort,
-                        backendPrefix,
-                        iamSession.user.username
-                    )
+                var url = String.Format(
+                    "{0}://{1}:{2}{3}/session_execution/student/{4}/session/feedback",
+                    this.backendProtocol,
+                    this.backendHost,
+                    this.backendPort,
+                    backendPrefix,
+                    iamSession.user.username
                 );
+                Debug.WriteLine("[ SessionExecutionService._GetCurrentFeedback ] URL = " + url);
+                string jsonResponse = await client.GetStringAsync(url);
                 Debug.WriteLine("[ SessionExecutionService.GetCurrentFeedback ] Feedback response:");
                 Debug.WriteLine(jsonResponse);
                 feedback = JsonConvert.DeserializeObject<Feedback?>(jsonResponse);

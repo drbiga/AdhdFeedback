@@ -16,15 +16,10 @@ namespace UI.Views
     /// </summary>
     public partial class SettingsView : Window
     {
-        public SettingsView()
+        public SettingsView(SettingsViewModel vm)
         {
-            DataContext = this;
             InitializeComponent();
-
-            // Pull the singleton instance from the IoC container
-            var navService = Ioc.Default.GetRequiredService<INavigationService>() as NavigationService;
-            navService?.Initialize(this.Frame);
-            navService?.NavigateTo(Ioc.Default.GetRequiredService<SettingsLoginPage>());
+            DataContext = vm;
         }
     }
 }

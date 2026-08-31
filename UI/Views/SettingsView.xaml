@@ -4,11 +4,29 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UI"
+        xmlns:vm="clr-namespace:UI.ViewModels"
+        xmlns:views="clr-namespace:UI.Views"
         xmlns:core="clr-namespace:Core.Models;assembly=Core"
         mc:Ignorable="d"
         Title="Settings" Height="450" Width="800">
 
-    <Grid>
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vm:SettingsMainViewModel}">
+            <views:SettingsMainView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SettingsLoginViewModel}">
+            <views:SettingsLoginView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ViewModelBase}">
+            <TextBlock Text="DataTemplate matched ViewModelBase fallback" 
+               Foreground="Red" FontSize="20" />
+        </DataTemplate>
+    </Window.Resources>
+
+    <ContentControl Content="{Binding CurrentViewModel}" />
+
+
+    <!--<Grid>
         <Frame Name="Frame" NavigationUIVisibility="Hidden" />
-    </Grid>
+    </Grid>-->
 </Window>

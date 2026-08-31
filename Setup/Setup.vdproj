@@ -230,15 +230,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Adhd Feedback"
-        "ProductCode" = "8:{15357B64-4CC6-4182-A445-433E29A70A6A}"
-        "PackageCode" = "8:{69265247-C27C-4926-9431-E6F2A60D8985}"
+        "ProductCode" = "8:{47AF7F8D-196B-41CF-8C41-318755DD25C3}"
+        "PackageCode" = "8:{43E0CEDD-DA3D-42C1-9F65-E92C91F819A5}"
         "UpgradeCode" = "8:{E30FD7B5-B9CC-429E-9FA0-2E0C7FE1A647}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.7"
+        "ProductVersion" = "8:1.1.0"
         "Manufacturer" = "8:LSU"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -766,7 +766,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_8CBB8CF3422D4C9E882AD88D30308CDC"
             {
-            "SourcePath" = "8:..\\UI\\obj\\Debug\\net9.0-windows\\win-x64\\apphost.exe"
+            "SourcePath" = "8:..\\UI\\obj\\Release\\net9.0-windows\\win-x64\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8C1DBC8BAD364489B6DE103F4AEAB1FB"

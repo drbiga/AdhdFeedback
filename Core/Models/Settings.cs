@@ -66,7 +66,8 @@ namespace Core.Models
                             ServerParams = _defaultProdServerParams;
                             break;
                         default:
-                            string message = "[ Settings ] Warning: Unrecognized environment value: " + value;
+                            string message = "[ Settings ] Warning: Unrecognized wsl" +
+                                "environment value: " + value;
                             Trace.WriteLine(message);
                             throw new Exception(message);
                     }
@@ -80,7 +81,7 @@ namespace Core.Models
             BackendProtocol = "http",
             BackendHost = "localhost",
             BackendPort = 8000,
-            BackendPrefix = "/"
+            BackendPrefix = ""
         };
         private ServerParams _defaultStagingServerParams = new ServerParams()
         {

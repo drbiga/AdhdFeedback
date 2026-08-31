@@ -8,7 +8,7 @@ using UI.Services;
 
 namespace UI.ViewModels
 {
-    internal class TrafficLightViewModel : INotifyPropertyChanged
+    internal class TrafficLightViewModel : ViewModelBase, INotifyPropertyChanged
     {
         private readonly ISessionExecutionService sessionExecutionService;
 

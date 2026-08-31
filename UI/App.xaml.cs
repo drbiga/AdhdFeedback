@@ -1,11 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.DependencyInjection;
-using Core.Models;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 
+using Core.Models;
 using UI.Services;
 using UI.Views;
 using UI.ViewModels;
@@ -76,26 +76,7 @@ namespace UI
 
             // ------------------------------------------------------------------
             // Main App
-            // Iterate over all connected
-            //int wid = 0;
-            //foreach (var screen in Screen.AllScreens)
-            //{
-            //    // Create a new window on this screen
-            //    var window = new TrafficLightWindow
-            //    {
-            //        WindowStartupLocation = WindowStartupLocation.Manual,
-            //        screen = screen
-            //    };
-            //    window.setWindowId(wid);
-            //    wid += 1;
-            //    window.Move();
-            //    //window.SetGreen();
 
-            //    // Show the window
-            //    window.Show();
-            //    activeWindows.Add(window); // Add the window to the active list
-            //}
-            // Configure your services
             IServiceCollection services = new ServiceCollection();
             if (settings.UseRealSessionExecutionService)
             {
@@ -108,20 +89,23 @@ namespace UI
                 services.AddSingleton<ISessionExecutionService, MockSessionExecutionService>();
             }
             services
-                .AddSingleton<INavigationService, UI.Services.NavigationService>()
-                .AddTransient<SettingsLoginViewModel>()
-                .AddTransient<SettingsLoginPage>(s => new SettingsLoginPage(s.GetRequiredService<SettingsLoginViewModel>()))
+                .AddSingleton<UI.ViewModels.ISettingsNavigationService, UI.Views.SettingsNavigationService>()
+                .AddSingleton<SettingsLoginViewModel>()
+                .AddSingleton<SettingsLoginView>()
 
-                .AddTransient<SettingsViewModel>()
-                .AddTransient<SettingsPage>(s => new SettingsPage(s.GetRequiredService<SettingsViewModel>()))
+                .AddSingleton<SettingsMainViewModel>()
+                .AddSingleton<SettingsMainView>()
 
-                .AddTransient<SettingsView>()
-                .AddTransient<TrafficLightViewModel>(s => new TrafficLightViewModel(s.GetRequiredService<ISessionExecutionService>()))
-                .AddTransient<TrafficLightWindow>(s => new TrafficLightWindow()
+                .AddSingleton<SettingsViewModel>()
+                .AddSingleton<SettingsView>()
+
+                .AddSingleton<TrafficLightViewModel>(s => new TrafficLightViewModel(s.GetRequiredService<ISessionExecutionService>()))
+                .AddSingleton<TrafficLightWindow>(s => new TrafficLightWindow()
                 {
                     WindowStartupLocation = WindowStartupLocation.Manual,
                     screen = Screen.AllScreens.FirstOrDefault()
                 });
+
             Ioc.Default.ConfigureServices(services.BuildServiceProvider());
 
             var mainWindow = Ioc.Default.GetRequiredService<TrafficLightWindow>();
@@ -163,6 +147,7 @@ namespace UI
                 _settingsView = Ioc.Default.GetRequiredService<SettingsView>();
                 _settingsView.Closed += (s, e) => { _settingsView = null; };
                 _settingsView.Show();
+                Ioc.Default.GetRequiredService<ISettingsNavigationService>().NavigateTo<SettingsLoginViewModel>();
             }
             else
             {
