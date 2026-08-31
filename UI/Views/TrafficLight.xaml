@@ -1,4 +1,4 @@
-﻿<Window x:Class="UI.TrafficLightWindow"
+﻿<Window x:Class="UI.Views.TrafficLightWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:converters="clr-namespace:UI.Converters"

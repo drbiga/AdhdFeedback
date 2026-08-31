@@ -1,8 +1,15 @@
-﻿using System.Diagnostics;
+﻿using CommunityToolkit.Mvvm.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
-using System.Windows.Forms;
+
+using Core.Models;
+using UI.Services;
+using UI.Views;
+using UI.ViewModels;
+
 using Application = System.Windows.Application;
 
 namespace UI
@@ -19,7 +26,7 @@ namespace UI
         // List to track active windows
         private static List<TrafficLightWindow> activeWindows = new List<TrafficLightWindow>();
 
-        private TestWindow? _testWindow;
+        private SettingsView? _settingsView;
 
         private NotifyIcon? _trayIcon;
 
@@ -35,8 +42,11 @@ namespace UI
 
             Trace.Listeners.Add(new TextWriterTraceListener(logPath));
             Trace.AutoFlush = true;
-
+            Trace.WriteLine("----------------------------------------------------");
             Trace.WriteLine("Application started at " + DateTime.Now);
+
+            var settings = Settings.Current;
+            Trace.WriteLine("Loaded settings: Environment = " + settings.Environment);
 
             SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
             base.OnStartup(e);
@@ -64,28 +74,45 @@ namespace UI
 
             _trayIcon.DoubleClick += (_, _) => ShowMainWindow();
 
-
             // ------------------------------------------------------------------
             // Main App
-            // Iterate over all connected
-            int wid = 0;
-            foreach (var screen in Screen.AllScreens)
+
+            IServiceCollection services = new ServiceCollection();
+            if (settings.UseRealSessionExecutionService)
             {
-                // Create a new window on this screen
-                var window = new TrafficLightWindow
+                Trace.WriteLine("[ App.xaml.cs ] Using REAL SessionExecutionService");
+                services.AddSingleton<ISessionExecutionService, SessionExecutionService>();
+            }
+            else
+            {
+                Trace.WriteLine("[ App.xaml.cs ] Using MOCK SessionExecutionService");
+                services.AddSingleton<ISessionExecutionService, MockSessionExecutionService>();
+            }
+            services
+                .AddSingleton<UI.ViewModels.ISettingsNavigationService, UI.Views.SettingsNavigationService>()
+                .AddSingleton<SettingsLoginViewModel>()
+                .AddSingleton<SettingsLoginView>()
+
+                .AddSingleton<SettingsMainViewModel>()
+                .AddSingleton<SettingsMainView>()
+
+                .AddSingleton<SettingsViewModel>()
+                .AddSingleton<SettingsView>()
+
+                .AddSingleton<TrafficLightViewModel>(s => new TrafficLightViewModel(s.GetRequiredService<ISessionExecutionService>()))
+                .AddSingleton<TrafficLightWindow>(s => new TrafficLightWindow()
                 {
                     WindowStartupLocation = WindowStartupLocation.Manual,
-                    screen = screen
-                };
-                window.setWindowId(wid);
-                wid += 1;
-                window.Move();
-                //window.SetGreen();
+                    screen = Screen.AllScreens.FirstOrDefault()
+                });
 
-                // Show the window
-                window.Show();
-                activeWindows.Add(window); // Add the window to the active list
-            }
+            Ioc.Default.ConfigureServices(services.BuildServiceProvider());
+
+            var mainWindow = Ioc.Default.GetRequiredService<TrafficLightWindow>();
+            mainWindow.setWindowId(0);
+            mainWindow.Move();
+            activeWindows.Add(mainWindow);
+            mainWindow.Show();
             // ------------------------------------------------------------------
             // Http Server
             HttpServer.Start();
@@ -97,7 +124,7 @@ namespace UI
             var menu = new ContextMenuStrip();
 
             menu.Items.Add("Show Traffic Light", null, (_, _) => ShowMainWindow());
-            menu.Items.Add("Verify Data Collection", null, (_, _) => ShowTestWindow());
+            menu.Items.Add("Settings", null, (_, _) => ShowSettings());
             menu.Items.Add("Exit", null, (_, _) => ExitApp());
 
             return menu;
@@ -105,12 +132,6 @@ namespace UI
 
         private void ShowMainWindow()
         {
-            //if (Current.MainWindow == null)
-            //    return;
-
-            //Current.MainWindow.Show();
-            //Current.MainWindow.WindowState = WindowState.Normal;
-            //Current.MainWindow.Activate();
             foreach (var window in activeWindows)
             {
                 window.Show();
@@ -119,17 +140,18 @@ namespace UI
             }
         }
 
-        private void ShowTestWindow()
+        private void ShowSettings()
         {
-            if (_testWindow == null)
+            if (_settingsView == null)
             {
-                _testWindow = new TestWindow();
-                _testWindow.Closed += (s, e) => { _testWindow = null; };
-                _testWindow.Show();
+                _settingsView = Ioc.Default.GetRequiredService<SettingsView>();
+                _settingsView.Closed += (s, e) => { _settingsView = null; };
+                _settingsView.Show();
+                Ioc.Default.GetRequiredService<ISettingsNavigationService>().NavigateTo<SettingsLoginViewModel>();
             }
             else
             {
-                _testWindow.Activate();
+                _settingsView.Activate();
             }
         }
 

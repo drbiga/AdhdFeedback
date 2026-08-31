@@ -1,22 +1,23 @@
-﻿using System.ComponentModel;
+﻿using CommunityToolkit.Mvvm.DependencyInjection;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
-using UI.Util;
 using UI.Services;
+using UI.Util;
 using UI.ViewModels;
-
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using LightColor = UI.ViewModels.TrafficLightViewModel.LightColor;
 
-namespace UI
+namespace UI.Views
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     ///
-    public partial class TrafficLightWindow : Window
+    public partial class TrafficLightWindow : System.Windows.Window
     {
         /// <summary>
         ///  Window ID, used to identify which screen this window belongs to.
@@ -51,7 +52,7 @@ namespace UI
         {
             InitializeComponent();
             
-            TrafficLightViewModel vm = new TrafficLightViewModel();
+            TrafficLightViewModel vm = Ioc.Default.GetRequiredService<TrafficLightViewModel>();
             vm.PropertyChanged += Vm_PropertyChanged;
 
             DataContext = vm;
@@ -62,6 +63,13 @@ namespace UI
             beepPlayer.Open(new Uri(@"Media\Beep.mp3", UriKind.Relative));
             beepTimer = new DispatcherTimer() { Interval = TimeSpan.FromSeconds(BEEP_TICK_INTERVAL) };
             beepTimer.Tick += BeepTick;
+        }
+
+        public void Show()
+        {
+            if (WindowStartupLocation == null)
+                throw new Exception("[ TrafficLightWindow.Show ] WindowStartupLocation is null, cannot determine initial position");
+            base.Show();
         }
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
@@ -113,13 +121,13 @@ namespace UI
                 // Start beeping
                 timeSinceLastFeedbackBeep = BEEP_PERIOD; // So that it beeps immediately
                 StartBeeping();
-                Debug.WriteLine("Started beeping");
+                Debug.WriteLine("[ TrafficLightWindow.LightPropertyChanged ] Started beeping");
             }
             else
             {
                 // Stop beeping
                 StopBeeping();
-                Debug.WriteLine("Stopped beeping");
+                Debug.WriteLine("[ TrafficLightWindow.LightPropertyChanged ] Stopped beeping");
             }
 
             previousColor = currentColor;
@@ -144,11 +152,17 @@ namespace UI
         {
             if (vm.Enabled)
             {
+                string message = "[ TrafficLightWindow.EnabledPropertyChanged ] Traffic light enabled, showing window";
+                Debug.WriteLine(message);
+                Trace.WriteLine(message);
                 this.beepingEnabled = true;
                 this.Show();
             }
             else
             {
+                string message = "[ TrafficLightWindow.EnabledPropertyChanged ] Traffic light disabled, hiding window";
+                Debug.WriteLine(message);
+                Trace.WriteLine(message);
                 this.beepingEnabled = false;
                 this.Hide();
             }
@@ -230,6 +244,11 @@ namespace UI
         // Method to move the window
         public void Move()
         {
+            if (WindowStartupLocation == null)
+                throw new Exception("[ TrafficLightWindow.Move ] WindowStartupLocation is null, cannot move");
+            if (screen == null)
+                throw new Exception("[ TrafficLightWindow.Move ] The screen attribute is null, cannot move");
+
             this.positionState.Next();
         }
 

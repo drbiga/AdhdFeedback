@@ -5,6 +5,11 @@ using System.Net.Http;
 using System.Diagnostics;
 
 using UI.Models;
+using System.Threading.Tasks;
+using Core.Models;
+
+using IamSession = UI.Models.IamSession;
+using Feedback = UI.Models.Feedback;
 
 namespace UI.Services
 {
@@ -42,8 +47,9 @@ namespace UI.Services
         public Session active_session;
     }
 
-    public class SessionExecutionService
+    public class SessionExecutionService : ISessionExecutionService
     {
+
         private static SessionExecutionService instance;
         private string backendProtocol;
         private string backendHost;
@@ -51,8 +57,8 @@ namespace UI.Services
         private string backendPrefix;
         private string localServerHost;
         private int localServerPort;
-        private IamSession iamSession;
-        private Feedback currentFeedback;
+        private IamSession? iamSession;
+        private Feedback? currentFeedback;
 
         private bool sessionHasFeedback;
 
@@ -64,46 +70,20 @@ namespace UI.Services
         {
             if (instance == null)
             {
-                Debug.WriteLine("[ SessionExecutionService.GetOrCreate ] Creating new instance of the session execution service");
+                string message = "[ SessionExecutionService.GetOrCreate ] Creating new instance of the session execution service";
+                Debug.WriteLine(message);
+                Trace.WriteLine(message);
                 instance = new SessionExecutionService();
             }
             return instance;
         }
 
-        private SessionExecutionService()
+        public SessionExecutionService()
         {
             this.iamSession = null;
             this.currentFeedback = null;
 
-            // ------------------------------------------------------------------------
-            // Local backend config for dev purposes
-#if DEBUG
-            //this.backendProtocol = "http";
-            //this.backendHost = "127.0.0.1";
-            //this.backendPort = 8000;
-            //this.backendPrefix = "";
-            this.backendProtocol = "https";
-            this.backendHost = "lsuadhd.centralus.cloudapp.azure.com";
-            this.backendPort = 443;
-            this.backendPrefix = "/api";
-#endif
-            // ------------------------------------------------------------------------
-            // Staging backend config
-#if STAGING
-            this.backendProtocol = "https";
-            this.backendHost = "testlsuadhd.centralus.cloudapp.azure.com";
-            this.backendPort = 443;
-            this.backendPrefix = "/api";
-#endif
-
-            // ------------------------------------------------------------------------
-            // Production backend config
-#if RELEASE
-            this.backendProtocol = "https";
-            this.backendHost = "lsuadhd.centralus.cloudapp.azure.com";
-            this.backendPort = 443;
-            this.backendPrefix = "/api";
-#endif
+            UpdateServerParamsFromSettings();
 
             // ------------------------------------------------------------------------
             localServerHost = "localhost";
@@ -114,6 +94,17 @@ namespace UI.Services
             this.sessionHasFeedback = true;
 
             InitializeIamSession();
+        }
+
+        public void UpdateServerParamsFromSettings()
+        {
+            var serverParams = Settings.Current.ServerParams;
+            this.backendProtocol = serverParams.BackendProtocol;
+            this.backendHost = serverParams.BackendHost;
+            this.backendPort = serverParams.BackendPort;
+            this.backendPrefix = serverParams.BackendPrefix;
+
+            Debug.WriteLine(serverParams);
         }
 
         private async Task InitializeIamSession()
@@ -128,11 +119,12 @@ namespace UI.Services
                     {
                         continue;
                     }
-                    else if (this.iamSession == null && iamSession != null)
+                    if (this.iamSession == null)
                     {
                         this.iamSession = iamSession;
+                        continue;
                     }
-                    else if (iamSession != null && iamSession.token.Equals(this.iamSession.token))
+                    if (!iamSession.token.Equals(this.iamSession.token))
                     {
                         this.iamSession = iamSession;
                     }
@@ -180,61 +172,70 @@ namespace UI.Services
                 return this.currentFeedback;
             }
             this.datetimeLastUpdate = DateTime.Now;
-            // Running in another thread in order not to block unity and make the game appear laggy.
-            Task.Run(() =>
-            {
-                Task<Feedback?> task = Task.Run(async () =>
-                {
-                    HttpClient client = new HttpClient();
-                    Feedback? feedback = null;
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", iamSession.token);
-                    try
-                    {
-
-                        string jsonResponse = await client.GetStringAsync(
-                            String.Format(
-                                "{0}://{1}:{2}{3}/session_execution/student/{4}/session/feedback",
-                                this.backendProtocol,
-                                this.backendHost,
-                                this.backendPort,
-                                backendPrefix,
-                                iamSession.user.username
-                            )
-                        );
-                        Debug.WriteLine("[ SessionExecutionService.GetCurrentFeedback ] Feedback response:");
-                        Debug.WriteLine(jsonResponse);
-                        feedback = JsonConvert.DeserializeObject<Feedback?>(jsonResponse);
-                        sessionHasFeedback = true;
-                    }
-                    catch (HttpRequestException error)
-                    {
-                        if (error.StatusCode == HttpStatusCode.BadRequest)
-                        {
-                            Debug.WriteLine("Feedback still not available. User possibly did not start session yet.");
-                        }
-                        else if (error.StatusCode == HttpStatusCode.MethodNotAllowed)
-                        {
-                            this.sessionHasFeedback = false;
-                            Debug.WriteLine("Feedback not available. User possibly has no feedback for this session.\n" + error.Data);
-                            Trace.WriteLine("Feedback not available. User possibly has no feedback for this session.\n" + error.Data);
-                        }
-                        else
-                        {
-                            Debug.WriteLine("[ SessionExecutionService.GetCurrentFeedback ] Unknown error");
-                            Debug.WriteLine(error.ToString());
-                        }
-                    }
-                    return feedback;
-                });
-
-                var newFeedback = task.Result;
-                if (newFeedback != null)
-                {
-                    this.currentFeedback = newFeedback;
-                }
-            });
+            _GetCurrentFeedback();
 
             return this.currentFeedback;
+        }
+
+        /// <summary>
+        /// Gets the current feedback for the active student session.
+        /// This method is async and updates the currentFeedback variable when the response is received.
+        /// The async version is necessary to prevent blocking the main thread while waiting for the response
+        /// from the backend, which can take some time, and we don't want to freeze the UI while waiting for it.
+        /// </summary>
+        private async void _GetCurrentFeedback()
+        {
+            HttpClient client = new HttpClient();
+            Feedback? feedback = null;
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", iamSession.token);
+            try
+            {
+                var url = String.Format(
+                    "{0}://{1}:{2}{3}/session_execution/student/{4}/session/feedback",
+                    this.backendProtocol,
+                    this.backendHost,
+                    this.backendPort,
+                    backendPrefix,
+                    iamSession.user.username
+                );
+                Debug.WriteLine("[ SessionExecutionService._GetCurrentFeedback ] URL = " + url);
+                string jsonResponse = await client.GetStringAsync(url);
+                Debug.WriteLine("[ SessionExecutionService.GetCurrentFeedback ] Feedback response:");
+                Debug.WriteLine(jsonResponse);
+                feedback = JsonConvert.DeserializeObject<Feedback?>(jsonResponse);
+                sessionHasFeedback = true;
+            }
+            catch (HttpRequestException error)
+            {
+                if (error.StatusCode == HttpStatusCode.BadRequest)
+                {
+                    Debug.WriteLine("[ SessionExecutionService.GetCurrentFeedback ] Feedback still not available. User possibly did not start session yet.");
+                    Trace.WriteLine("[ SessionExecutionService.GetCurrentFeedback ] Feedback still not available. User possibly did not start session yet.");
+                }
+                else if (error.StatusCode == HttpStatusCode.MethodNotAllowed)
+                {
+                    this.sessionHasFeedback = false;
+                    Debug.WriteLine("[ SessionExecutionService.GetCurrentFeedback ] Feedback not available. User possibly has no feedback for this session.\n" + error.Data);
+                    Trace.WriteLine("[ SessionExecutionService.GetCurrentFeedback ] Feedback not available. User possibly has no feedback for this session.\n" + error.Data);
+                }
+                else
+                {
+                    Debug.WriteLine("[ SessionExecutionService.GetCurrentFeedback ] Unknown error");
+                    Debug.WriteLine(error.ToString());
+                    Trace.WriteLine("[ SessionExecutionService.GetCurrentFeedback ] Unknown error");
+                    Trace.WriteLine(error.ToString());
+                }
+            }
+            
+            if (feedback != null)
+            {
+                this.currentFeedback = feedback;
+            }
+            else
+            {
+                Trace.WriteLine("[ SessionExecutionService.GetCurrentFeedback ] Feedback is null");
+                Debug.WriteLine("[ SessionExecutionService.GetCurrentFeedback ] Feedback is null");
+            }
         }
 
         public bool SessionIsSet()
@@ -246,37 +247,6 @@ namespace UI.Services
         {
             return this.iamSession;
         }
-
-
-        /// <summary>
-        /// Gets the next session for the currently active student.
-        /// Assumes that the current IAM session is already set.
-        /// </summary>
-        /// <returns>The next session the student is supposed to do.</returns>
-        //async public Task<Session> GetNextSession()
-        //{
-        //    if (iamSession == null)
-        //        throw new Exception("Student does not have an active session");
-        //    HttpClient client = new HttpClient();
-        //    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", iamSession.token);
-        //    string jsonResponse = await client.GetStringAsync(
-        //        String.Format(
-        //            "{0}://{1}:{2}{3}/session_execution/student/{4}/remaining_sessions",
-        //            this.backendProtocol,
-        //            this.backendHost,
-        //            this.backendPort,
-        //            backendPrefix,
-        //            iamSession.user.username
-        //        )
-        //    );
-        //    var settings = new JsonSerializerSettings
-        //    {
-        //        NullValueHandling = NullValueHandling.Ignore,
-        //        MissingMemberHandling = MissingMemberHandling.Ignore
-        //    };
-        //    Session[] sessions = JsonConvert.DeserializeObject<Session[]>(jsonResponse, settings);
-        //    return sessions[0];
-        //}
 
         async public Task<Session> GetStudentActiveSession()
         {

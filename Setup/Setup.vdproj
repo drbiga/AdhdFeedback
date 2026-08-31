@@ -15,13 +15,13 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_8CBB8CF3422D4C9E882AD88D30308CDC"
+        "MsmKey" = "8:_71D0F641992E4F0C8B6E955EAD245AF3"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_B2FF6571B1AC430DAFA469656CF7600A"
+        "MsmKey" = "8:_8CBB8CF3422D4C9E882AD88D30308CDC"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -114,6 +114,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
             }
         }
     }
@@ -146,10 +154,10 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B2FF6571B1AC430DAFA469656CF7600A"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_71D0F641992E4F0C8B6E955EAD245AF3"
             {
-            "SourcePath" = "8:..\\UI\\favicon.png"
-            "TargetName" = "8:favicon.png"
+            "SourcePath" = "8:..\\UI\\favicon.ico"
+            "TargetName" = "8:favicon.ico"
             "Tag" = "8:"
             "Folder" = "8:_8C1DBC8BAD364489B6DE103F4AEAB1FB"
             "Condition" = "8:"
@@ -222,15 +230,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Adhd Feedback"
-        "ProductCode" = "8:{15357B64-4CC6-4182-A445-433E29A70A6A}"
-        "PackageCode" = "8:{69265247-C27C-4926-9431-E6F2A60D8985}"
+        "ProductCode" = "8:{47AF7F8D-196B-41CF-8C41-318755DD25C3}"
+        "PackageCode" = "8:{43E0CEDD-DA3D-42C1-9F65-E92C91F819A5}"
         "UpgradeCode" = "8:{E30FD7B5-B9CC-429E-9FA0-2E0C7FE1A647}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.7"
+        "ProductVersion" = "8:1.1.0"
         "Manufacturer" = "8:LSU"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -354,7 +362,7 @@
             "Target" = "8:_8CBB8CF3422D4C9E882AD88D30308CDC"
             "Folder" = "8:_DC9D3F2C2A414E43B884C1C74BC7BFF3"
             "WorkingFolder" = "8:_8C1DBC8BAD364489B6DE103F4AEAB1FB"
-            "Icon" = "8:"
+            "Icon" = "8:_71D0F641992E4F0C8B6E955EAD245AF3"
             "Feature" = "8:"
             }
         }

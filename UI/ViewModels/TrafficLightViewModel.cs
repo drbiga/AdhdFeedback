@@ -8,8 +8,10 @@ using UI.Services;
 
 namespace UI.ViewModels
 {
-    internal class TrafficLightViewModel : INotifyPropertyChanged
+    internal class TrafficLightViewModel : ViewModelBase, INotifyPropertyChanged
     {
+        private readonly ISessionExecutionService sessionExecutionService;
+
         #region Attributes
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -76,8 +78,10 @@ namespace UI.ViewModels
         #endregion
 
         #region methods
-        public TrafficLightViewModel()
+        public TrafficLightViewModel(ISessionExecutionService service)
         {
+            this.sessionExecutionService = service;
+
             colorTimer.Tick += LightTick;
             colorTimer.Start();
 
@@ -86,6 +90,8 @@ namespace UI.ViewModels
                 //Enabled = !Enabled;
             };
             enabledTimer.Start();
+
+            Enabled = true;
         }
 
         private void LightTick(object sender, EventArgs args)
@@ -97,28 +103,20 @@ namespace UI.ViewModels
 
         private void UpdateLightsFromBackend()
         {
+            string m = "[ TrafficLightViewModel ] Updating traffic light from backend feedback";
+            Debug.WriteLine(m);
+            UpdateSessionHasFeedback();
             Feedback state;
             try
             {
-                //state = GetCurrentFeedback();
-                SessionExecutionService s = SessionExecutionService.GetOrCreate();
-                state = s.GetCurrentFeedback();
+                state = sessionExecutionService.GetCurrentFeedback();
                 IsReady = true;
                 if (state == null)
                 {
-                    // It is possible to not have any feedbacks simply because the
-                    // session has not started yet.
-                    // In this case, we just show green.
-                    if (s.SessionHasFeedback())
-                    {
-                        Debug.WriteLine("[ TrafficLightViewModel ] No feedback received but the session has feedback. Setting light to GREEN");
-                        CurrentLight = LightColor.Green;
-                    }
-                    else
-                    {
-                        Enabled = false;
-                        Debug.WriteLine("[ TrafficLightViewModel ] Disabled Traffic Light because this session does not have feedback");
-                    }
+                    string message = "[ TrafficLightViewModel.UpdateLightsFromBackend ] No feedback received but the session has feedback. Setting light to GREEN";
+                    Debug.WriteLine(message);
+                    Trace.WriteLine(message);
+                    CurrentLight = LightColor.Green;
                     return;
                 }
                 var processedValue = state.output.ToLower();
@@ -145,57 +143,30 @@ namespace UI.ViewModels
             }
         }
 
-        /// <summary>
-        /// Get the current feedback from the backend service
-        /// </summary>
-        /// <returns>Feedback</returns>
-        private Feedback GetCurrentFeedback()
+        private void UpdateSessionHasFeedback()
         {
-            #region Real Feedback
-            var state = SessionExecutionService.GetOrCreate().GetCurrentFeedback();
-            return state;
-            #endregion
-
-            #region Mocked Feedback
-            //if (CurrentLight == LightColor.Red)
-            //{
-            //    return new Feedback()
-            //    {
-            //        output = "distracted"
-            //    };
-            //}
-            //else if (CurrentLight == LightColor.Yellow)
-            //{
-            //    return new Feedback()
-            //    {
-            //        output = "normal"
-            //    };
-            //}
-            //else
-            //{
-            //    return new Feedback()
-            //    {
-            //        output = "focused"
-            //    };
-            //}
-            #endregion
-        }
-
-        private void NextLight()
-        {
-            currentColorIndex = (currentColorIndex - 1);
-            if (currentColorIndex == 0)
+            // It is possible to not have any feedbacks simply because the
+            // session has not started yet.
+            // In this case, we just show green.
+            if (sessionExecutionService.SessionHasFeedback())
             {
-                CurrentLight = LightColor.Red;
-                currentColorIndex = 3;
-            }
-            else if (currentColorIndex == 1)
-            {
-                CurrentLight = LightColor.Yellow;
+                if (!Enabled)
+                {
+                    Enabled = true;
+                    string message = "[ TrafficLightViewModel ] This session has feedback. Toggling Enabled from false to true";
+                    Debug.WriteLine(message);
+                    Trace.WriteLine(message);
+                }
             }
             else
             {
-                CurrentLight = LightColor.Green;
+                if (Enabled)
+                {
+                    Enabled = false;
+                    string message = "[ TrafficLightViewModel ] This session has feedback. Toggling Enabled from true to false";
+                    Trace.WriteLine(message);
+                    Debug.WriteLine(message);
+                }
             }
         }
 
