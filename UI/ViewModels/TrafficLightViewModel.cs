@@ -95,6 +95,15 @@ namespace UI.ViewModels
             Enabled = true;
         }
 
+        public void ShutdownPermanently()
+        {
+            colorTimer.Stop();
+            enabledTimer.Stop();
+            Enabled = false;
+            IsReady = false;
+            CurrentLight = LightColor.None;
+        }
+
         private void LightTick(object sender, EventArgs args)
         {
             UpdateLightsFromBackend();

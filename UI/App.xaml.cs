@@ -30,6 +30,8 @@ namespace UI
 
         private NotifyIcon? _trayIcon;
 
+        private IServiceCollection services = new ServiceCollection();
+
         protected override void OnStartup(StartupEventArgs e)
         {
             string logDir = Path.Combine(
@@ -52,7 +54,40 @@ namespace UI
             base.OnStartup(e);
 
             // ------------------------------------------------------------------------
+            _InitializeTrayIcon();
 
+            // ------------------------------------------------------------------
+            // Main App
+            _InitializeTrafficLight();
+            // ------------------------------------------------------------------
+            // Http Server
+            try
+            {
+                HttpServer.Start().GetAwaiter().GetResult();
+            }
+            catch (IOException ex)
+            {
+                Ioc.Default.GetRequiredService<TrafficLightViewModel>().ShutdownPermanently();
+                Trace.WriteLine("Could not initialize the HTTP server. It may already be running or the port is in use.");
+                System.Windows.MessageBox.Show(
+                    "Please contact Matheus at mcost16@lsu.edu.\n\n"
+                    + "There was a critical system error on the laptop and the HTTP server could not be initialized.\n"
+                    + "Please be sure to report the Feedback HTTP server issue so that better assistance can be provided.\n"
+                    + "The application will now close."
+                );
+                ExitApp();
+            }
+            catch
+            {
+                Ioc.Default.GetRequiredService<TrafficLightViewModel>().ShutdownPermanently();
+                Trace.WriteLine("Could not initialize the HTTP server. It may already be running or the port is in use.");
+                System.Windows.MessageBox.Show("Please contact Matheus at mcost16@lsu.edu for assistance.\n\n");
+                ExitApp();
+            }
+        }
+
+        private void _InitializeTrayIcon()
+        {
             // 1. Load the PNG from your project resources
             // Ensure your PNG "Build Action" is set to "Resource" or "Content"
             var iconUri = new Uri("pack://application:,,,/favicon.png");
@@ -73,12 +108,11 @@ namespace UI
             }
 
             _trayIcon.DoubleClick += (_, _) => ShowMainWindow();
+        }
 
-            // ------------------------------------------------------------------
-            // Main App
-
-            IServiceCollection services = new ServiceCollection();
-            if (settings.UseRealSessionExecutionService)
+        private void _InitializeTrafficLight()
+        {
+            if (Settings.Current.UseRealSessionExecutionService)
             {
                 Trace.WriteLine("[ App.xaml.cs ] Using REAL SessionExecutionService");
                 services.AddSingleton<ISessionExecutionService, SessionExecutionService>();
@@ -113,11 +147,7 @@ namespace UI
             mainWindow.Move();
             activeWindows.Add(mainWindow);
             mainWindow.Show();
-            // ------------------------------------------------------------------
-            // Http Server
-            HttpServer.Start();
         }
-
 
         private ContextMenuStrip BuildContextMenu()
         {
